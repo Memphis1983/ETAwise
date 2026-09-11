@@ -1778,3 +1778,94 @@ dialog p:last-child {
     animation: none !important;
   }
 }
+.hero-lede {
+  max-width: 460px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.1px;
+  color: #4c5445;
+  margin-bottom: 18px;
+}
+.h2-clause {
+  display: block;
+  max-width: 480px;
+  margin-top: 16px;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.1px;
+  color: #565f4d;
+}
+.workspace-notice {
+  margin: 0;
+  padding: 9px 25px;
+  border-bottom: 1px solid #e3e6db;
+  background: #f7f8f3;
+  color: #59624e;
+  font-size: 9px;
+  letter-spacing: 0.6px;
+  line-height: 1.6;
+}
+.header nav a[aria-current="true"] {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+@media (max-width: 540px) {
+  .hero-lede {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .h2-clause {
+    font-size: 14px;
+    margin-top: 13px;
+  }
+  .workspace-notice {
+    padding-inline: 13px;
+  }
+}
+/* Five nav items do not fit inline between 541px and ~595px, so the existing
+   hamburger pattern now covers that band as well. */
+@media (max-width: 700px) and (min-width: 541px) {
+  .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    margin-left: auto;
+    margin-right: 10px;
+  }
+  .menu-toggle span {
+    width: 20px;
+    height: 1px;
+    background: var(--ink);
+    margin-inline: auto;
+  }
+  .header nav {
+    display: none;
+    position: absolute;
+    top: 79px;
+    left: -20px;
+    right: -20px;
+    padding: 20px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 12px 15px #25282008;
+    font-size: 13px;
+  }
+  .header nav.open {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .header nav a {
+    padding: 13px 0;
+  }
+}

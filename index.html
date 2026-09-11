@@ -6,26 +6,108 @@
     <meta name="theme-color" content="#f5f3ed" />
     <meta
       name="description"
-      content="ETAwise is building AI-assisted follow-through for support escalations. Clear ownership, next actions, and update commitments. Explore the product concept."
+      content="AI-assisted support operations for helpdesk teams. ETAwise turns escalated tickets into confirmed owners, next actions, and dated updates. In development."
     />
     <meta
       property="og:title"
-      content="ETAwise | Follow-through, not follow-ups."
+      content="AI-assisted support operations | ETAwise"
     />
     <meta
       property="og:description"
-      content="AI-assisted clarity for the space between escalated and resolved. In development."
+      content="ETAwise turns escalated support tickets into confirmed ownership, next actions, and dated update commitments. In development."
     />
     <meta property="og:type" content="website" />
-    <title>ETAwise | AI-assisted escalation follow-through</title>
+    <meta property="og:site_name" content="ETAwise" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="AI-assisted support operations | ETAwise"
+    />
+    <meta
+      name="twitter:description"
+      content="ETAwise turns escalated support tickets into confirmed ownership, next actions, and dated update commitments. In development."
+    />
+    <title>AI-assisted support operations for escalations | ETAwise</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/src/style.css" />
     <script type="module" src="/src/main.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "SoftwareApplication",
+            "name": "ETAwise",
+            "applicationCategory": "BusinessApplication",
+            "applicationSubCategory": "Support Operations",
+            "description": "ETAwise is an AI-assisted support operations tool, in development, that turns escalated tickets into confirmed ownership, next actions, and dated update commitments for the tier 2 and tier 3 teams that pick them up.",
+            "featureList": [
+              "Bring case context from pasted ticket notes or conversation exports",
+              "Summarise the ticket and suggest owners, next actions, and promised dates, each linked to the source text",
+              "Track confirmed update deadlines and surface overdue commitments"
+            ],
+            "audience": {
+              "@type": "Audience",
+              "audienceType": "Helpdesk, technical support, and support operations teams handling escalated tickets"
+            }
+          },
+          {
+            "@type": "Organization",
+            "name": "ETAwise"
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is ETAwise available to use today?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Not yet. ETAwise is in development. This website introduces the product direction; the interactive preview uses fictional data and does not run AI."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does ETAwise predict a resolution ETA?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. A promised update is not a promised fix. The planned product tracks confirmed actions and update commitments, not speculative resolution dates."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Will it replace our existing helpdesk?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. ETAwise is intended to complement existing support workflows. It is designed to sit alongside the ticketing system you already run, whether that is Zendesk, Freshdesk, ServiceNow, or Jira Service Management, starting with pasted notes or conversation exports. Native integrations are a future direction, not a current feature."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Who is it being built for?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Support operations teams, service-delivery managers, and anyone who owns escalation management across frontline agents, tier 2 and tier 3 specialists, and service partners. The workflow is not limited to one industry."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What will it cost?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Pricing has not been announced. We are shaping the initial product scope before setting subscription plans. There are no payments or subscriptions on this website."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="header wrap">
-      <a href="#" class="brand" aria-label="ETAwise home"
+      <a href="/" class="brand" aria-label="ETAwise home"
         ><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span
         >ETA<span class="brand-light">wise</span
         ><span class="brand-dot">.</span></a
@@ -39,9 +121,11 @@
         <span></span><span></span>
       </button>
       <nav id="navigation" aria-label="Main navigation">
-        <a href="#approach">The approach</a
+        <a href="#approach">Why tickets stall</a
+        ><a href="#preview">Prototype</a
         ><a href="#how-it-works">How it works</a
-        ><a href="#ai">AI, with context</a>
+        ><a href="#faq">FAQ</a
+        ><a href="#ai">AI principles</a>
       </nav>
       <a class="nav-cta" href="#early-access"
         >Early access <span aria-hidden="true">&#8599;</span></a
@@ -60,6 +144,10 @@
             <h1>
               Follow-through.<br />Not <span class="serif">follow-ups.</span>
             </h1>
+            <p class="hero-lede">
+              AI-assisted support operations for helpdesk and technical support
+              teams.
+            </p>
             <p class="hero-description">
               The case is escalated. The customer is waiting.<br
                 class="desktop-break"
@@ -67,13 +155,14 @@
               What happens next shouldn't be a mystery.
             </p>
             <p class="hero-detail">
-              We're building ETAwise to turn support conversations into clear
-              ownership, next actions, and update commitments. With AI that
-              helps your team see the whole picture.
+              ETAwise is an AI-assisted support operations tool, in development,
+              that turns escalated tickets into confirmed ownership, next
+              actions, and dated update commitments for the tier 2 and tier 3
+              teams that pick them up.
             </p>
             <div class="hero-actions">
               <a class="button button-dark" href="#preview"
-                >Explore the concept <span aria-hidden="true">&#8599;</span></a
+                >See the prototype <span aria-hidden="true">&#8599;</span></a
               ><a class="text-link" href="#early-access"
                 >About early access <span aria-hidden="true">&#8594;</span></a
               >
@@ -85,6 +174,7 @@
           </div>
           <div
             class="hero-visual"
+            role="img"
             aria-label="Illustration of a case moving from handoff to next action"
           >
             <div class="orbit orbit-one"></div>
@@ -136,11 +226,15 @@
             <h2>
               A busy thread isn't<br />the same as
               <span class="serif">progress.</span>
+              <span class="h2-clause"
+                >Why support escalations stall in the queue.</span
+              >
             </h2>
             <p>
-              A new reply can keep a case looking active. But has someone
+              A new reply can keep a ticket looking active. But has someone
               accepted ownership? Is there a next action? Has an update actually
-              been promised?
+              been promised? SLA timers cover the first response, not what
+              happens after an escalation.
             </p>
           </div>
         </div>
@@ -195,31 +289,47 @@
         <div class="wrap">
           <div class="preview-heading">
             <div>
-              <p class="eyebrow"><span>02</span> A LOOK AHEAD</p>
+              <p class="eyebrow"><span>02</span> INSIDE THE PROTOTYPE</p>
               <h2>
                 Less reconstruction.<br /><span class="serif"
                   >More direction.</span
                 >
+                <span class="h2-clause"
+                  >A case overview for every open escalation.</span
+                >
               </h2>
             </div>
             <p>
-              Explore a fictional case to see the intended experience.<br /><span
+              Explore a fictional escalation backlog to see the intended
+              experience.<br /><span
                 class="preview-disclaimer"
-                >Interactive concept. Not live AI or a connected helpdesk.</span
+                id="preview-disclaimer"
+                >Interactive prototype. Not live AI or a connected
+                helpdesk.</span
               >
             </p>
           </div>
-          <div class="workspace">
+          <div
+            class="workspace"
+            role="group"
+            aria-label="Interactive prototype with fictional data"
+            aria-describedby="preview-disclaimer"
+            data-fictional="true"
+          >
+            <p class="workspace-notice">
+              Illustrative prototype. Every ticket, date, and AI note below is
+              fictional.
+            </p>
             <div class="workspace-top">
               <div class="workspace-brand">
                 <span class="mini-mark" aria-hidden="true">e</span> ETAwise
                 <span>/</span> Case overview
               </div>
-              <span class="prototype-pill">PRODUCT CONCEPT</span>
+              <span class="prototype-pill">INTERACTIVE PROTOTYPE</span>
             </div>
             <div class="workspace-body">
               <aside class="case-sidebar" aria-label="Example case selection">
-                <p class="micro">YOUR ESCALATIONS <span>03</span></p>
+                <p class="micro">YOUR ESCALATION QUEUE <span>03</span></p>
                 <button
                   class="case-button active"
                   data-case="attention"
@@ -304,8 +414,8 @@
             </div>
           </div>
           <p class="preview-caption">
-            Designed to complement your helpdesk. Native integrations are
-            planned, not currently available.
+            Designed to complement the helpdesk and ticketing system you already
+            run. Native integrations are planned, not currently available.
           </p>
         </div>
       </section>
@@ -317,6 +427,7 @@
             <h2>
               From scattered context<br />to a
               <span class="serif">clear next step.</span>
+              <span class="h2-clause">How ETAwise works, in three steps.</span>
             </h2>
             <p>
               A focused first release. No new helpdesk. No attempt to automate
@@ -331,7 +442,7 @@
             >
             <h3>Bring the context.</h3>
             <p>
-              Start with pasted case notes or conversation exports. Keep the
+              Start with pasted ticket notes or conversation exports. Keep the
               relevant history together, without migrating your support
               operation.
             </p>
@@ -343,8 +454,9 @@
             >
             <h3>Find the commitments.</h3>
             <p>
-              Planned AI assistance summarises the case and suggests owners,
-              next actions, and promised dates, linked to the source text.
+              ETAwise summarises the ticket and suggests owners, next actions,
+              and promised dates, each linked to the source text. In
+              development.
             </p>
             <span class="step-tag">AI / HUMAN-REVIEWED</span>
           </article>
@@ -355,17 +467,91 @@
             <h3>Keep the next step visible.</h3>
             <p>
               Once your team confirms the details, track update deadlines and
-              surface overdue commitments for follow-through.
+              surface overdue commitments before they slip past the SLA.
             </p>
             <span class="step-tag">ACTION / DEADLINE TRACKING</span>
           </article>
         </div>
       </section>
 
+      <section class="section wrap faq-section" id="faq">
+        <div>
+          <p class="eyebrow"><span>04</span> A FEW THINGS TO KNOW</p>
+          <h2>
+            Clarity starts<br /><span class="serif">right here.</span>
+            <span class="h2-clause"
+              >FAQ: AI-assisted support operations, in plain terms.</span
+            >
+          </h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>
+              Is ETAwise available to use today?<span aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              Not yet. ETAwise is in development. This website introduces the
+              product direction; the interactive preview uses fictional data and
+              does not run AI.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Does ETAwise predict a resolution ETA?<span aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              No. A promised update is not a promised fix. The planned product
+              tracks confirmed actions and update commitments, not speculative
+              resolution dates.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Will it replace our existing helpdesk?<span aria-hidden="true"
+                >+</span
+              >
+            </summary>
+            <p>
+              No. ETAwise is intended to complement existing support workflows.
+              It is designed to sit alongside the ticketing system you already
+              run, whether that is Zendesk, Freshdesk, ServiceNow, or Jira
+              Service Management, starting with pasted notes or conversation
+              exports. Native integrations are a future direction, not a current
+              feature.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Who is it being built for?<span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              Support operations teams, service-delivery managers, and anyone
+              who owns escalation management across frontline agents, tier 2 and
+              tier 3 specialists, and service partners. The workflow is not
+              limited to one industry.
+            </p>
+          </details>
+          <details>
+            <summary>
+              What will it cost?<span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              Pricing has not been announced. We are shaping the initial product
+              scope before setting subscription plans. There are no payments or
+              subscriptions on this website.
+            </p>
+          </details>
+        </div>
+      </section>
+
       <section class="ai-section" id="ai">
         <div class="wrap ai-grid">
           <div>
-            <p class="eyebrow"><span>04</span> INTELLIGENCE WITH BOUNDARIES</p>
+            <p class="eyebrow"><span>05</span> INTELLIGENCE WITH BOUNDARIES</p>
             <h2>
               AI for the context.<br /><span class="serif"
                 >People for the call.</span
@@ -376,8 +562,7 @@
               better-informed next action.
             </p>
             <span class="development-label"
-              ><span class="orange-dot"></span> Our intended product
-              principles</span
+              ><span class="orange-dot"></span> Our product principles</span
             >
           </div>
           <div class="ai-principles">
@@ -415,72 +600,6 @@
         </div>
       </section>
 
-      <section class="section wrap faq-section">
-        <div>
-          <p class="eyebrow"><span>05</span> A FEW THINGS TO KNOW</p>
-          <h2>Clarity starts<br /><span class="serif">right here.</span></h2>
-        </div>
-        <div class="faq-list">
-          <details>
-            <summary>
-              Is ETAwise available to use today?<span aria-hidden="true"
-                >+</span
-              >
-            </summary>
-            <p>
-              Not yet. ETAwise is in development. This website introduces the
-              product direction; the interactive preview uses fictional data and
-              does not run AI.
-            </p>
-          </details>
-          <details>
-            <summary>
-              Does ETAwise predict a resolution ETA?<span aria-hidden="true"
-                >+</span
-              >
-            </summary>
-            <p>
-              No. A promised update is not a promised fix. The planned product
-              tracks confirmed actions and update commitments, not speculative
-              resolution dates.
-            </p>
-          </details>
-          <details>
-            <summary>
-              Will it replace our existing helpdesk?<span aria-hidden="true"
-                >+</span
-              >
-            </summary>
-            <p>
-              No. ETAwise is intended to complement existing support workflows.
-              The initial scope starts with pasted notes or conversation
-              exports. Native integrations are a future direction, not a current
-              feature.
-            </p>
-          </details>
-          <details>
-            <summary>
-              Who is it being built for?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              Support operations teams, service-delivery managers, and
-              businesses coordinating cases across frontline teams, specialists,
-              and service partners. The workflow is not limited to one industry.
-            </p>
-          </details>
-          <details>
-            <summary>
-              What will it cost?<span aria-hidden="true">+</span>
-            </summary>
-            <p>
-              Pricing has not been announced. We are shaping the initial product
-              scope before setting subscription plans. There are no payments or
-              subscriptions on this website.
-            </p>
-          </details>
-        </div>
-      </section>
-
       <section class="access-section wrap" id="early-access">
         <div class="access-top">
           <p class="eyebrow">
@@ -493,6 +612,10 @@
             <h2>
               Every handoff deserves<br />a
               <span class="serif">way forward.</span>
+              <span class="h2-clause"
+                >Early access to AI-assisted support operations, when it
+                opens.</span
+              >
             </h2>
             <p>
               We're building a more considered way to follow through.<br />AI-assisted
@@ -507,8 +630,11 @@
               We're preparing the first release. Signup and contact details will
               be published here when ready.
             </p>
+            <!-- Contact link and early-access signup drop in here, replacing
+            the prototype link, once a verified business address and a validated
+            endpoint exist. -->
             <a href="#preview" class="text-link"
-              >Take another look <span aria-hidden="true">&#8599;</span></a
+              >Open the prototype <span aria-hidden="true">&#8599;</span></a
             >
           </div>
         </div>
@@ -516,7 +642,7 @@
     </main>
     <footer class="wrap footer">
       <div>
-        <a href="#" class="brand" aria-label="ETAwise home"
+        <a href="/" class="brand" aria-label="ETAwise home"
           ><span class="brand-mark" aria-hidden="true"
             ><i></i><i></i><i></i></span
           >ETA<span class="brand-light">wise</span
@@ -526,6 +652,10 @@
       </div>
       <div class="footer-meta">
         <span>India. Building for support teams everywhere.</span>
+        <p>
+          Page content last updated
+          <time datetime="2026-09-11">11 September 2026</time>
+        </p>
         <div>
           <span>&copy; <span id="year">2026</span> ETAwise</span
           ><button data-notice="privacy">Privacy</button
@@ -539,7 +669,7 @@
         <span class="micro">ETAwise / INFORMATION</span
         ><button class="dialog-close" aria-label="Close dialog">&#215;</button>
       </div>
-      <h2 id="dialog-title"></h2>
+      <h2 id="dialog-title">Website information</h2>
       <div id="dialog-content"></div>
     </dialog>
   </body>

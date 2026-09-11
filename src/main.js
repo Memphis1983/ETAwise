@@ -22,6 +22,27 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+// Marks the navigation link for the section currently in view.
+const navLinks = [...navigation.querySelectorAll('a[href^="#"]')];
+const navSections = navLinks
+  .map((link) => document.querySelector(link.getAttribute("href")))
+  .filter(Boolean);
+if (navSections.length && "IntersectionObserver" in window) {
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.find((entry) => entry.isIntersecting);
+      if (!visible) return;
+      for (const link of navLinks) {
+        if (link.getAttribute("href") === `#${visible.target.id}`)
+          link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      }
+    },
+    { rootMargin: "-45% 0px -45% 0px" },
+  );
+  navSections.forEach((section) => sectionObserver.observe(section));
+}
+
 // All preview records and AI outputs are authored examples, never live inference.
 const examples = {
   attention: {
