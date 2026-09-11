@@ -1,4 +1,4 @@
-# ETAwise website
+# Netdin website
 
 Responsive, static product-introduction website. Vite builds plain HTML, CSS, and JavaScript; no framework or server runtime required. Fonts are bundled and served locally, with no third-party font requests.
 

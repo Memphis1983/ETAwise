@@ -71,7 +71,7 @@ test("mobile navigation and FAQ support keyboard and touch", async ({
   }
   await page
     .locator("summary")
-    .filter({ hasText: "Does ETAwise predict a resolution ETA?" })
+    .filter({ hasText: "Does Netdin predict a resolution ETA?" })
     .click();
   await expect(
     page.getByText(/No. A promised update is not a promised fix/),

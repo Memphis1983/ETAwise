@@ -25,7 +25,7 @@ document.addEventListener("keydown", (event) => {
 // All preview records and AI outputs are authored examples, never live inference.
 const examples = {
   attention: {
-    id: "EW-1042",
+    id: "ND-1042",
     status: "Awaiting specialist",
     title: "A busy thread. A stalled case.",
     description:
@@ -38,7 +38,7 @@ const examples = {
       'Frontline agent, Friday 09:15: "Following up again on the replacement review. Please confirm who will take ownership and when we can expect the next update." No receiving-team reply is included in this fictional record.',
   },
   review: {
-    id: "EW-1043",
+    id: "ND-1043",
     status: "Review accepted",
     title: "An owner. A clear next step.",
     description:
@@ -51,7 +51,7 @@ const examples = {
       'Access team, Monday 11:30: "We have accepted the case and will review the access logs. We will send an update by Tuesday at 14:00 UTC. We cannot confirm a resolution time yet."',
   },
   scheduled: {
-    id: "EW-1044",
+    id: "ND-1044",
     status: "Visit scheduled",
     title: "On-site visit confirmed",
     description:
@@ -118,7 +118,7 @@ const notices = {
   terms: [
     "Website terms",
     [
-      "ETAwise is an in-development software project. This website is an informational product preview, not a live support service. It does not offer troubleshooting, engineer dispatch, subscriptions, or guaranteed resolution times.",
+      "Netdin is an in-development software project. This website is an informational product preview, not a live support service. It does not offer troubleshooting, engineer dispatch, subscriptions, or guaranteed resolution times.",
       "Screens, case details, and AI outputs are illustrative. Planned capabilities may change. No native helpdesk integrations or live AI processing are provided by this website.",
       "Use of the future product will be subject to separate service terms. Operator identity and business contact details will be published before commercial services or registration are offered.",
     ],
