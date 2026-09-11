@@ -1,0 +1,189 @@
+<!doctype html>
+<!--
+  Build-time source for public/og-image.png. Not part of the shipped site:
+  nothing links to it, and Vite's default single entry is the root index.html,
+  so this file never appears in dist/.
+
+  Render it with `npm run og:image` (scripts/generate-og-image.mjs), which serves
+  this file from the Vite dev server and screenshots it at exactly 1200x630.
+
+  Design tokens below are copied from src/style.css :root. That file is the
+  source of truth; if a token changes there, update it here and re-run the
+  generator.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ETAwise Open Graph card (1200x630)</title>
+    <script type="module">
+      // Same local font packages the site uses. No network font requests.
+      import "@fontsource-variable/dm-sans";
+      import "@fontsource/instrument-serif/latin-400.css";
+      import "@fontsource/instrument-serif/latin-400-italic.css";
+    </script>
+    <style>
+      :root {
+        --paper: #f5f3ed;
+        --ink: #252820;
+        --muted: #686a60;
+        --line: #dcded3;
+        --accent: #d74b27;
+        --serif: "Instrument Serif", Georgia, serif;
+        --sans: "DM Sans Variable", Arial, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--paper);
+      }
+
+      /* Exactly the OG canvas. Overflow is deliberately left visible so the
+         generator's clipping check can detect anything that does not fit. */
+      .card {
+        width: 1200px;
+        height: 630px;
+        padding: 72px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+      }
+
+      /* Brand lockup: src/style.css .brand at 27px, scaled x1.333 to 36px.
+         Every metric is scaled by the same factor so the lockup keeps its
+         proportions (bars 21->28, middle 15->20, gap/height 4->5,
+         margin 10->13, letter-spacing -1.4px -> -1.87px). */
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: -1.87px;
+        white-space: nowrap;
+      }
+      .brand-light {
+        font-weight: 450;
+      }
+      .brand-dot {
+        color: var(--accent);
+      }
+      .brand-mark {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-right: 13px;
+        transform: skewY(-12deg);
+      }
+      .brand-mark i {
+        display: block;
+        width: 28px;
+        height: 5px;
+        background: var(--accent);
+      }
+      .brand-mark i:nth-child(2) {
+        width: 20px;
+      }
+
+      /* Kicker row: src/style.css .hero-kicker, scaled for a 1200px canvas
+         (9px -> 13px label, 6px -> 8px dot, 26px -> 36px rule,
+         11px -> 16px stage). */
+      .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 13px;
+        white-space: nowrap;
+      }
+      .kicker-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #55674c;
+        flex-shrink: 0;
+      }
+      .kicker-label {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 2px;
+      }
+      .kicker-rule {
+        width: 36px;
+        height: 1px;
+        background: var(--line);
+        flex-shrink: 0;
+      }
+      .kicker-stage {
+        font-size: 16px;
+        font-weight: 400;
+        color: var(--muted);
+      }
+
+      /* Headline: src/style.css h1 treatment, scaled up to 110px for
+         legibility at small feed sizes; letter-spacing scaled to match. */
+      .headline {
+        margin: 0;
+        font-size: 110px;
+        font-weight: 500;
+        letter-spacing: -6.06px;
+        line-height: 1.04;
+        white-space: nowrap;
+      }
+      .headline .serif {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-style: italic;
+        letter-spacing: -3.75px;
+        color: var(--accent);
+      }
+
+      /* Supporting line: the site's .hero-lede sentence, scaled up. */
+      .lede {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 500;
+        line-height: 1.5;
+        letter-spacing: -0.2px;
+        color: #4c5445;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-top">
+        <span class="brand"
+          ><span class="brand-mark" aria-hidden="true"
+            ><i></i><i></i><i></i></span
+          >ETA<span class="brand-light">wise</span
+          ><span class="brand-dot">.</span></span
+        >
+        <span class="kicker"
+          ><span class="kicker-dot"></span
+          ><span class="kicker-label">AI-ASSISTED SUPPORT OPERATIONS</span
+          ><span class="kicker-rule"></span
+          ><span class="kicker-stage">In development</span></span
+        >
+      </div>
+      <h1 class="headline">
+        Follow-through.<br />Not <span class="serif">follow-ups.</span>
+      </h1>
+      <p class="lede">
+        AI-assisted support operations for helpdesk and technical support teams.
+      </p>
+    </div>
+  </body>
+</html>

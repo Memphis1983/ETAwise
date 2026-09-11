@@ -18,7 +18,18 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ETAwise" />
+    <!-- Image paths are root-relative because no domain is confirmed yet. Some
+    scrapers require an absolute URL, so prefix both with the verified origin
+    once one exists. Regenerate the file with `npm run og:image`. -->
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="ETAwise logo above the headline Follow-through. Not follow-ups., with the line AI-assisted support operations for helpdesk and technical support teams, and an In development label."
+    />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og-image.png" />
     <meta
       name="twitter:title"
       content="AI-assisted support operations | ETAwise"
