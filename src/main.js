@@ -132,7 +132,7 @@ const notices = {
     "Website privacy",
     [
       "This preview website has no analytics scripts, advertising trackers, or non-essential cookies. There is no registration or signup form and no account can be created. Interactive examples run in your browser and use fictional data.",
-      "The early-access section has a contact form. Submitting it sends the name, email address, and message you type to a Function hosted with this website on Azure Static Web Apps, which relays them by email to ETAwise so we can reply. We keep that message, and whatever you choose to put in it, in order to reply. To limit automated abuse, the Function also holds a short-lived count of recent submissions per network connection in memory, keyed by a one-way hash of the connection address.",
+      "The early-access section has a contact form. Submitting it sends the name, email address, and message you type to Formspree, a third-party form service, which forwards them by email to ETAwise so we can reply. Formspree therefore handles your submission on the way to us, under its own terms and privacy policy. We keep that message, and whatever you choose to put in it, in order to reply.",
       "The page also publishes the contact address contactus@etawise.tech. That link opens your own email program; nothing is sent or stored by this website when you use it. If you do email us, we receive and keep that message in order to reply.",
       "Your browser requests the website files from Azure Static Web Apps, a Microsoft hosting service. Microsoft may process connection information such as your IP address and request time according to its configuration and policies.",
       "Do not send support records, customer details, or other personal information to us through this preview. A full privacy notice, operator identity, and retention terms must be published before registration or product data collection begins.",
@@ -174,21 +174,29 @@ document.getElementById("year").textContent = new Date().getFullYear();
 // Progressive enhancement, in this order:
 //   1. The markup carries `required`, `minlength`, `maxlength` and `type` and
 //      no `novalidate`, so a browser with JavaScript switched off still gets
-//      constraint validation and a native POST to /api/contact.
+//      constraint validation and a native POST straight to Formspree.
 //   2. This module turns native validation off and takes over, because the
 //      native bubbles cannot be tied to the field with aria-describedby, are
 //      not announced on our terms, and vanish on the next keystroke.
 //
-// Nothing here is a security control. Every rule below is enforced again in
-// api/src/functions/contact.js, which is the only side that counts.
+// The submission goes to Formspree, whose endpoint is the form's `action`
+// attribute in index.html. Nothing here is a security control, and there is no
+// longer a server of ours behind the form: the rules below are the only
+// validation we control. Formspree runs its own server-side checks and spam
+// filtering on top, but that layer is theirs, we cannot see or configure it
+// from here, and passing these checks does not mean a submission is accepted.
 // ---------------------------------------------------------------------------
 const contactForm = document.querySelector("#contact-form");
 if (contactForm) initContactForm(contactForm);
 
 function initContactForm(form) {
   const CONTACT_EMAIL = "contactus@etawise.tech";
-  // Mirrors api/src/lib/validate.js. Duplicated on purpose: the browser copy is
-  // a courtesy, the Function copy is the rule. Change both together.
+  // The endpoint ships with this placeholder in it until someone pastes a real
+  // Formspree form ID into index.html. While it is still there, submitting
+  // would POST to a URL that does not exist, so the guard below stops instead.
+  const ENDPOINT_PLACEHOLDER = "YOUR_FORMSPREE_ID";
+  // Courtesy checks for the person filling the form in, so they get a message
+  // they can act on without a round trip. They are not a guarantee.
   const NAME_MIN = 2;
   const NAME_MAX = 80;
   const MESSAGE_MIN = 10;
@@ -204,12 +212,10 @@ function initContactForm(form) {
   const submitButton = form.querySelector('button[type="submit"]');
   const submitLabel = submitButton.querySelector(".button-label");
   const idleLabel = submitLabel.textContent;
-  const honeypot = form.querySelector('[name="website"]');
-  const timestamp = form.querySelector('[name="ts"]');
+  const honeypot = form.querySelector('[name="_gotcha"]');
   let submitting = false;
 
   form.noValidate = true;
-  timestamp.value = String(loadedAt);
 
   const fields = [
     {
@@ -367,29 +373,62 @@ function initContactForm(form) {
     panel.focus();
   }
 
+  // Formspree reports a rejection as a JSON `errors` array, each entry carrying
+  // a `message` and, for a field-level problem, the `field` it belongs to. Its
+  // spam filtering arrives the same way. Anything else, including no JSON body
+  // at all, falls through to the generic message: an unreadable rejection is
+  // still a rejection, and the status we already have is the honest thing to
+  // report.
   async function readErrors(response) {
     try {
       const body = await response.json();
-      if (body && typeof body.errors === "object" && body.errors)
-        return body.errors;
+      if (body && Array.isArray(body.errors)) return body.errors;
     } catch {
-      // A 400 without a JSON body is still a 400. Fall through to the generic
-      // message rather than throwing away the status we already have.
+      // Not JSON. Nothing to map onto the fields.
     }
-    return null;
+    return [];
   }
 
   async function handleRejection(response) {
-    if (response.status === 400) {
+    if (response.status === 429) {
+      // No wait time is quoted. Formspree owns this limit, does not document a
+      // Retry-After, and a cross-origin response only exposes that header if the
+      // server opts in, so any number here would be invented.
+      setStatus(
+        "error",
+        `Too many messages have been sent from this connection. Try again in a few minutes, or email ${CONTACT_EMAIL} directly.`,
+      );
+      return;
+    }
+    if (response.status >= 500) {
+      setStatus(
+        "error",
+        `The form service returned an error and your message was not sent. Please try again shortly, or email ${CONTACT_EMAIL} directly.`,
+      );
+      return;
+    }
+    if (response.status === 404) {
+      setStatus(
+        "error",
+        `The contact form is not connected correctly, so nothing was sent. Please email ${CONTACT_EMAIL} directly.`,
+      );
+      return;
+    }
+    if (response.status >= 400) {
       const errors = await readErrors(response);
       const invalid = [];
-      if (errors) {
-        for (const field of fields) {
-          const message = errors[field.name];
-          if (typeof message === "string" && message) {
-            showFieldError(field, message);
-            invalid.push(field);
-          }
+      for (const field of fields) {
+        // The wording on these comes from Formspree, not from us.
+        const entry = errors.find(
+          (item) =>
+            item &&
+            item.field === field.name &&
+            typeof item.message === "string" &&
+            item.message,
+        );
+        if (entry) {
+          showFieldError(field, entry.message);
+          invalid.push(field);
         }
       }
       if (invalid.length) {
@@ -400,42 +439,12 @@ function initContactForm(form) {
         );
         return;
       }
+      // No field to point at. Covers Formspree's spam rejection, which is a
+      // deliberate refusal we cannot argue with and must not dress up as
+      // success, as well as anything else it declines.
       setStatus(
         "error",
-        `Your message could not be accepted. Check the form and try again, or email ${CONTACT_EMAIL} directly.`,
-      );
-      return;
-    }
-    if (response.status === 413) {
-      setStatus(
-        "error",
-        `That message is too large to send. Shorten it, or email ${CONTACT_EMAIL} directly.`,
-      );
-      return;
-    }
-    if (response.status === 429) {
-      const seconds = Number(response.headers.get("Retry-After"));
-      const wait =
-        Number.isFinite(seconds) && seconds > 0
-          ? `Try again in about ${Math.max(1, Math.ceil(seconds / 60))} ${Math.ceil(seconds / 60) > 1 ? "minutes" : "minute"}.`
-          : "Try again in a few minutes.";
-      setStatus(
-        "error",
-        `Too many messages have been sent from this connection. ${wait} You can also email ${CONTACT_EMAIL} directly.`,
-      );
-      return;
-    }
-    if (response.status === 503) {
-      setStatus(
-        "error",
-        `The contact endpoint is not configured yet, so nothing was sent. Please email ${CONTACT_EMAIL} directly.`,
-      );
-      return;
-    }
-    if (response.status >= 500) {
-      setStatus(
-        "error",
-        `Something went wrong on our side and your message was not sent. Please email ${CONTACT_EMAIL} directly.`,
+        `Your message was not accepted, so nothing was sent. Please email ${CONTACT_EMAIL} directly.`,
       );
       return;
     }
@@ -457,8 +466,9 @@ function initContactForm(form) {
     }
     summary.textContent = "";
 
-    // Both checks are repeated in the Function. Doing them here just saves a
-    // round trip and gives a human a message they can act on.
+    // The honeypot is checked again by Formspree, which discards any submission
+    // carrying a filled `_gotcha`. Checking it here saves a round trip and gives
+    // a person caught by it a message they can act on.
     if (honeypot.value.trim() !== "") {
       setStatus(
         "error",
@@ -474,23 +484,29 @@ function initContactForm(form) {
       return;
     }
 
+    // Read back off the form so the endpoint stays defined in exactly one
+    // place: the `action` attribute in index.html.
+    const endpoint = form.getAttribute("action") || "";
+    if (!endpoint || endpoint.includes(ENDPOINT_PLACEHOLDER)) {
+      // Refuse rather than pretend. Posting to an endpoint that does not exist
+      // would lose the message, and reporting success would lose it silently.
+      setStatus(
+        "error",
+        `This form is not connected yet, so nothing was sent. Please email ${CONTACT_EMAIL} directly and we will reply.`,
+      );
+      return;
+    }
+
     setSubmitting(true);
     setStatus("pending", "Sending your message\u2026");
     try {
-      const response = await fetch(form.action, {
+      // FormData, not JSON: Formspree reads an ordinary form encoding, and
+      // Accept: application/json keeps the reply as JSON so the visitor stays
+      // on this page instead of being redirected to Formspree's own thank-you.
+      const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          name: readField(fields[0]),
-          email: readField(fields[1]),
-          message: readField(fields[2]),
-          consent: readField(fields[3]),
-          website: honeypot.value,
-          ts: timestamp.value,
-        }),
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
       });
       if (response.ok) {
         setStatus("success", "Message sent. Thank you for getting in touch.");
@@ -501,7 +517,7 @@ function initContactForm(form) {
     } catch {
       setStatus(
         "error",
-        `We could not reach the server, so nothing was sent. Check your connection and try again, or email ${CONTACT_EMAIL} directly.`,
+        `We could not reach the form service, so nothing was sent. Check your connection and try again, or email ${CONTACT_EMAIL} directly.`,
       );
     } finally {
       setSubmitting(false);

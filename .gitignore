@@ -3,6 +3,3 @@ dist/
 test-results/
 playwright-report/
 .env*
-# Local Azure Functions settings hold the contact-form credentials. They belong
-# in the Static Web App's application settings, never in the repository.
-api/local.settings.json

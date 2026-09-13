@@ -99,13 +99,23 @@ await page.getByRole("button", { name: /Send message/ }).click();
 if (!(await page.locator("#contact-name-error").isVisible()))
   problems.push("client-side validation did not run");
 
-await page.route("**/api/contact", (route) =>
+await page.route("**/formspree.io/f/*", (route) =>
   route.fulfill({
     status: 200,
     contentType: "application/json",
     body: JSON.stringify({ ok: true }),
   }),
 );
+// The committed action still carries the YOUR_FORMSPREE_ID placeholder, and the
+// guard in main.js refuses to submit while it does. Swapping in an ID-shaped
+// endpoint is what lets the real submit path run, which is the point here: the
+// fetch below is what proves connect-src allows https://formspree.io under this
+// policy. The request itself is answered by the mock above.
+await page
+  .locator("#contact-form")
+  .evaluate((form) =>
+    form.setAttribute("action", "https://formspree.io/f/cspcheck"),
+  );
 await page.fill("#contact-name", "Casey Quinn");
 await page.fill("#contact-email", "casey@example.com");
 await page.fill("#contact-message", "Checking the form under the policy.");

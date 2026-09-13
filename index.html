@@ -676,14 +676,25 @@
             </p>
           </div>
           <p class="contact-summary" id="contact-summary" aria-live="polite"></p>
+          <!-- ==========================================================
+          FORMSPREE: replace YOUR_FORMSPREE_ID in the action below with the ID
+          from the Formspree dashboard (Forms > your form > the endpoint URL,
+          which looks like https://formspree.io/f/abcdwxyz). This action
+          attribute is the only place the endpoint is defined; src/main.js
+          reads it back off the form. The ID is public by design — it travels
+          in the page every visitor downloads — so it is safe to commit, and
+          there is no key or environment variable to set anywhere.
+          Until it is swapped in, the form refuses to submit and says so
+          rather than pretending it sent: see the guard in src/main.js.
+          ========================================================== -->
           <!-- No `novalidate`: without JavaScript the browser's own constraint
-          validation is the safety net, and the native POST to /api/contact
-          still works. src/main.js switches native validation off once it runs
-          so it can own the messages and their announcements. -->
+          validation is the safety net, and the native POST straight to
+          Formspree still works. src/main.js switches native validation off
+          once it runs so it can own the messages and their announcements. -->
           <form
             class="contact-form"
             id="contact-form"
-            action="/api/contact"
+            action="https://formspree.io/f/YOUR_FORMSPREE_ID"
             method="post"
             aria-labelledby="contact-form-title"
           >
@@ -764,17 +775,28 @@
                 ><span class="field-error-text"></span>
               </p>
             </div>
+            <!-- Honeypot. Bots fill fields they cannot see; people never see
+            this one. Named `_gotcha` so Formspree's own filtering discards any
+            submission that arrives with it filled, on top of the check in
+            src/main.js. Positioned off-screen rather than display:none, and
+            hidden from assistive technology, so a person cannot reach it and a
+            screen reader never announces it. -->
             <div class="offscreen-field" aria-hidden="true">
-              <label for="contact-website">Website</label>
+              <label for="contact-gotcha">Leave this field empty</label>
               <input
-                id="contact-website"
-                name="website"
+                id="contact-gotcha"
+                name="_gotcha"
                 type="text"
                 tabindex="-1"
                 autocomplete="off"
               />
             </div>
-            <input type="hidden" name="ts" id="contact-ts" value="" />
+            <!-- Sets the subject line of the email Formspree forwards to us. -->
+            <input
+              type="hidden"
+              name="_subject"
+              value="New enquiry from the ETAwise website"
+            />
             <div class="contact-actions">
               <button class="button button-dark" type="submit">
                 <span class="button-label">Send message</span

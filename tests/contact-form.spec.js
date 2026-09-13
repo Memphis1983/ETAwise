@@ -1,17 +1,35 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// The form refuses anything submitted within 3 seconds of load, in the browser
-// and again in the Function. Tests that expect a submit to leave the page have
-// to sit out that window rather than mock around it, because the guard is one
-// of the things being tested.
+// The form refuses anything submitted within 3 seconds of load. Tests that
+// expect a submit to go out have to sit out that window rather than mock around
+// it, because the guard is one of the things being tested.
 const MIN_ELAPSED_MS = 3000;
+
+// Every request pattern below is Formspree's endpoint, which is the form's
+// action attribute. Nothing else is called.
+const FORMSPREE = "https://formspree.io/f/*";
+
+// index.html ships with the YOUR_FORMSPREE_ID placeholder still in the action,
+// and main.js refuses to submit while it is there. That refusal has its own test
+// below; every other submit test replaces the action with an ID-shaped endpoint
+// first, which is what the site will look like once a real ID is pasted in.
+const CONNECTED_ENDPOINT = "https://formspree.io/f/testtest";
 
 async function openForm(page) {
   const openedAt = Date.now();
   await page.goto("/#early-access");
   await expect(page.locator("#contact-form")).toBeVisible();
   return openedAt;
+}
+
+async function connectForm(page) {
+  await page
+    .locator("#contact-form")
+    .evaluate(
+      (form, endpoint) => form.setAttribute("action", endpoint),
+      CONNECTED_ENDPOINT,
+    );
 }
 
 async function fillValidForm(page) {
@@ -30,11 +48,10 @@ async function waitOutTimingGuard(page, openedAt) {
 }
 
 function mockEndpoint(page, status, body) {
-  return page.route("**/api/contact", (route) =>
+  return page.route(FORMSPREE, (route) =>
     route.fulfill({
       status,
       contentType: "application/json",
-      headers: status === 429 ? { "Retry-After": "420" } : {},
       body: JSON.stringify(body),
     }),
   );
@@ -126,8 +143,9 @@ test("an invalid email address is rejected and clears once corrected", async ({
 
 test("an unticked consent box blocks the submit", async ({ page }) => {
   const openedAt = await openForm(page);
+  await connectForm(page);
   let requests = 0;
-  await page.route("**/api/contact", (route) => {
+  await page.route(FORMSPREE, (route) => {
     requests += 1;
     return route.fulfill({
       status: 200,
@@ -151,17 +169,24 @@ test("an unticked consent box blocks the submit", async ({ page }) => {
   expect(requests).toBe(0);
 });
 
-test("a valid submit replaces the form with a confirmation", async ({
+test("a valid submit posts a form body to Formspree and confirms on the page", async ({
   page,
 }) => {
   const openedAt = await openForm(page);
-  const payloads = [];
-  await page.route("**/api/contact", (route) => {
-    payloads.push(route.request().postDataJSON());
+  await connectForm(page);
+  const posted = [];
+  await page.route(FORMSPREE, (route) => {
+    const request = route.request();
+    posted.push({
+      url: request.url(),
+      method: request.method(),
+      headers: request.headers(),
+      body: request.postData(),
+    });
     return route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ ok: true, message: "Message sent." }),
+      body: JSON.stringify({ ok: true, next: "/thanks" }),
     });
   });
 
@@ -183,21 +208,63 @@ test("a valid submit replaces the form with a confirmation", async ({
   );
   await expect(page.locator(".contact-confirmation")).toBeFocused();
 
-  expect(payloads).toHaveLength(1);
-  expect(payloads[0]).toMatchObject({
-    name: "Casey Quinn",
-    email: "casey.quinn@example.com",
-    consent: true,
-    website: "",
+  expect(posted).toHaveLength(1);
+  expect(posted[0].url).toBe(CONNECTED_ENDPOINT);
+  expect(posted[0].method).toBe("POST");
+  // Asking for JSON is what keeps the visitor here instead of being redirected
+  // to Formspree's own thank-you page.
+  expect(posted[0].headers.accept).toBe("application/json");
+  expect(posted[0].headers["content-type"]).toContain("multipart/form-data");
+  // A FormData body, so the fields arrive as multipart parts rather than JSON.
+  expect(posted[0].body).toContain('name="name"');
+  expect(posted[0].body).toContain("Casey Quinn");
+  expect(posted[0].body).toContain('name="email"');
+  expect(posted[0].body).toContain("casey.quinn@example.com");
+  expect(posted[0].body).toContain('name="consent"');
+  expect(posted[0].body).toContain('name="_subject"');
+  expect(posted[0].body).toContain("New enquiry from the ETAwise website");
+  expect(posted[0].body).toContain('name="_gotcha"');
+});
+
+test("an unreplaced form ID refuses to send instead of claiming success", async ({
+  page,
+}) => {
+  const openedAt = await openForm(page);
+  let requests = 0;
+  await page.route(FORMSPREE, (route) => {
+    requests += 1;
+    return route.fulfill({ status: 200, body: '{"ok":true}' });
   });
-  expect(Number(payloads[0].ts)).toBeGreaterThan(0);
+
+  // Deliberately not connected: the action is whatever index.html ships with.
+  await expect(page.locator("#contact-form")).toHaveAttribute(
+    "action",
+    "https://formspree.io/f/YOUR_FORMSPREE_ID",
+  );
+
+  await fillValidForm(page);
+  await waitOutTimingGuard(page, openedAt);
+  await page.getByRole("button", { name: "Send message" }).click();
+
+  const status = page.locator("#contact-status");
+  await expect(status).toHaveAttribute("data-state", "error");
+  await expect(status).toContainText("not connected yet");
+  await expect(status).toContainText("nothing was sent");
+  await expect(status).toContainText("contactus@etawise.tech");
+  await expect(page.locator(".contact-confirmation")).toHaveCount(0);
+  await expect(page.locator("#contact-form")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send message" })).toBeEnabled();
+  expect(requests).toBe(0);
 });
 
 test("a rate-limited submit explains the wait and offers the email address", async ({
   page,
 }) => {
   const openedAt = await openForm(page);
-  await mockEndpoint(page, 429, { ok: false, error: "too many", retryAfter: 420 });
+  await connectForm(page);
+  await mockEndpoint(page, 429, {
+    errors: [{ message: "Too many requests" }],
+  });
 
   await fillValidForm(page);
   await waitOutTimingGuard(page, openedAt);
@@ -206,20 +273,72 @@ test("a rate-limited submit explains the wait and offers the email address", asy
   const status = page.locator("#contact-status");
   await expect(status).toHaveAttribute("data-state", "error");
   await expect(status).toContainText("Too many messages");
-  await expect(status).toContainText("about 7 minutes");
+  // No wait time is quoted: Formspree owns the limit and does not tell us one.
+  await expect(status).toContainText("Try again in a few minutes");
   await expect(status).toContainText("contactus@etawise.tech");
   // The form is still there to retry with, and re-enabled.
   await expect(page.locator("#contact-form")).toBeVisible();
   await expect(page.getByRole("button", { name: "Send message" })).toBeEnabled();
 });
 
-test("an unconfigured endpoint says so instead of claiming success", async ({
+test("a service error and a dead network read differently", async ({ page }) => {
+  const openedAt = await openForm(page);
+  await connectForm(page);
+  await mockEndpoint(page, 500, { errors: [{ message: "Server error" }] });
+  await fillValidForm(page);
+  await waitOutTimingGuard(page, openedAt);
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.locator("#contact-status")).toContainText(
+    "The form service returned an error",
+  );
+  await expect(page.locator("#contact-status")).toContainText(
+    "contactus@etawise.tech",
+  );
+
+  await page.unroute(FORMSPREE);
+  await page.route(FORMSPREE, (route) => route.abort("failed"));
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.locator("#contact-status")).toContainText(
+    "could not reach the form service",
+  );
+  await expect(page.locator("#contact-status")).toContainText(
+    "contactus@etawise.tech",
+  );
+});
+
+test("field-level errors returned by Formspree are shown on the fields", async ({
   page,
 }) => {
   const openedAt = await openForm(page);
-  await mockEndpoint(page, 503, {
-    ok: false,
-    error: "not configured",
+  await connectForm(page);
+  // Formspree reports a rejection as an `errors` array, each entry naming the
+  // field it belongs to when there is one.
+  await mockEndpoint(page, 422, {
+    errors: [
+      { field: "message", message: "Message is too short.", code: "REQUIRED" },
+    ],
+  });
+
+  await fillValidForm(page);
+  await waitOutTimingGuard(page, openedAt);
+  await page.getByRole("button", { name: "Send message" }).click();
+
+  await expect(page.locator("#contact-message-error")).toContainText(
+    "Message is too short.",
+  );
+  await expect(page.locator("#contact-message")).toBeFocused();
+  await expect(page.locator("#contact-status")).toContainText(
+    "Check the fields marked above",
+  );
+});
+
+test("a spam rejection with no field to point at is reported, not dressed up", async ({
+  page,
+}) => {
+  const openedAt = await openForm(page);
+  await connectForm(page);
+  await mockEndpoint(page, 403, {
+    errors: [{ message: "Form submission rejected as spam" }],
   });
 
   await fillValidForm(page);
@@ -228,66 +347,29 @@ test("an unconfigured endpoint says so instead of claiming success", async ({
 
   const status = page.locator("#contact-status");
   await expect(status).toHaveAttribute("data-state", "error");
-  await expect(status).toContainText("not configured yet");
+  await expect(status).toContainText("was not accepted");
   await expect(status).toContainText("nothing was sent");
   await expect(status).toContainText("contactus@etawise.tech");
   await expect(page.locator(".contact-confirmation")).toHaveCount(0);
-});
-
-test("a server error and a dead network read differently", async ({ page }) => {
-  const openedAt = await openForm(page);
-  await mockEndpoint(page, 500, { ok: false });
-  await fillValidForm(page);
-  await waitOutTimingGuard(page, openedAt);
-  await page.getByRole("button", { name: "Send message" }).click();
-  await expect(page.locator("#contact-status")).toContainText(
-    "Something went wrong on our side",
-  );
-
-  await page.unroute("**/api/contact");
-  await page.route("**/api/contact", (route) => route.abort("failed"));
-  await page.getByRole("button", { name: "Send message" }).click();
-  await expect(page.locator("#contact-status")).toContainText(
-    "could not reach the server",
-  );
-});
-
-test("field-level errors returned by the endpoint are shown on the fields", async ({
-  page,
-}) => {
-  const openedAt = await openForm(page);
-  await mockEndpoint(page, 400, {
-    ok: false,
-    errors: { message: "Server says this message is too short." },
-  });
-
-  await fillValidForm(page);
-  await waitOutTimingGuard(page, openedAt);
-  await page.getByRole("button", { name: "Send message" }).click();
-
-  await expect(page.locator("#contact-message-error")).toContainText(
-    "Server says this message is too short.",
-  );
-  await expect(page.locator("#contact-message")).toBeFocused();
-  await expect(page.locator("#contact-status")).toContainText(
-    "Check the fields marked above",
-  );
 });
 
 test("the honeypot is unreachable and its own failure is handled", async ({
   page,
 }) => {
   const openedAt = await openForm(page);
+  await connectForm(page);
   let requests = 0;
-  await page.route("**/api/contact", (route) => {
+  await page.route(FORMSPREE, (route) => {
     requests += 1;
     return route.fulfill({ status: 200, body: "{}" });
   });
 
-  const honeypot = page.locator("#contact-website");
-  // Off-screen rather than display:none, so it is out of reach for a person and
-  // for assistive technology while a script still finds and fills it. That is
-  // the point: toBeHidden() would fail here and should.
+  const honeypot = page.locator("#contact-gotcha");
+  // Named _gotcha so Formspree discards a filled one too. Off-screen rather
+  // than display:none, so it is out of reach for a person and for assistive
+  // technology while a script still finds and fills it. That is the point:
+  // toBeHidden() would fail here and should.
+  await expect(honeypot).toHaveAttribute("name", "_gotcha");
   await expect(honeypot).toHaveAttribute("tabindex", "-1");
   await expect(page.locator(".offscreen-field")).toHaveAttribute(
     "aria-hidden",
@@ -301,7 +383,7 @@ test("the honeypot is unreachable and its own failure is handled", async ({
 
   await fillValidForm(page);
   // Only a script would ever put a value in here.
-  await page.locator("#contact-website").evaluate((input) => {
+  await honeypot.evaluate((input) => {
     input.value = "https://example.com";
   });
   await waitOutTimingGuard(page, openedAt);
@@ -317,8 +399,9 @@ test("a submit inside the first three seconds is held back", async ({
   page,
 }) => {
   await openForm(page);
+  await connectForm(page);
   let requests = 0;
-  await page.route("**/api/contact", (route) => {
+  await page.route(FORMSPREE, (route) => {
     requests += 1;
     return route.fulfill({ status: 200, body: "{}" });
   });
@@ -357,11 +440,15 @@ test("the form fits every width it has to fit", async ({ page }) => {
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("the form still posts natively to the endpoint", async ({ page }) => {
+  test("the form still posts natively to Formspree", async ({ page }) => {
     let posted = null;
-    await page.route("**/api/contact", (route) => {
+    await page.route(FORMSPREE, (route) => {
       const request = route.request();
-      posted = { method: request.method(), body: request.postData() };
+      posted = {
+        url: request.url(),
+        method: request.method(),
+        body: request.postData(),
+      };
       return route.fulfill({
         status: 200,
         contentType: "text/html; charset=utf-8",
@@ -383,8 +470,12 @@ test.describe("without JavaScript", () => {
       "Message sent.",
     );
     expect(posted).not.toBeNull();
+    // The action attribute is the endpoint with no JavaScript involved, so this
+    // is the URL as committed, placeholder ID and all.
+    expect(posted.url).toBe("https://formspree.io/f/YOUR_FORMSPREE_ID");
     expect(posted.method).toBe("POST");
     expect(posted.body).toContain("name=Casey+Quinn");
     expect(posted.body).toContain("consent=yes");
+    expect(posted.body).toContain("_subject=New+enquiry+from+the+ETAwise+website");
   });
 });
