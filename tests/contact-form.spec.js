@@ -396,15 +396,24 @@ test("a spam rejection with no field to point at is reported, not dressed up", a
   await expect(page.locator(".contact-confirmation")).toHaveCount(0);
 });
 
-test("the honeypot is unreachable and its own failure is handled", async ({
+test("an autofilled honeypot is cleared instead of losing the message", async ({
   page,
 }) => {
   const openedAt = await openForm(page);
   await connectForm(page);
   let requests = 0;
+  let sentGotcha = null;
   await page.route(FORMSPREE, (route) => {
     requests += 1;
-    return route.fulfill({ status: 200, body: "{}" });
+    const body = route.request().postData() ?? "";
+    // Multipart, so read the part back rather than parsing form encoding.
+    const match = body.match(/name="_gotcha"\r?\n\r?\n([^\r\n]*)/);
+    sentGotcha = match ? match[1] : "";
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: '{"ok":true}',
+    });
   });
 
   const honeypot = page.locator("#contact-gotcha");
@@ -425,17 +434,22 @@ test("the honeypot is unreachable and its own failure is handled", async ({
   ).not.toBe("none");
 
   await fillValidForm(page);
-  // Only a script would ever put a value in here.
+  // What a password manager does: fills the off-screen input it cannot tell is a
+  // trap. This used to be rejected as spam, which lost a real person's message.
   await honeypot.evaluate((input) => {
     input.value = "https://example.com";
   });
   await waitOutTimingGuard(page, openedAt);
   await page.getByRole("button", { name: "Send message" }).click();
 
-  await expect(page.locator("#contact-status")).toContainText(
+  // The submission goes through, and the honeypot leaves empty so Formspree's
+  // own filtering cannot discard it server-side either.
+  await expect(page.locator(".contact-confirmation")).toBeVisible();
+  expect(requests).toBe(1);
+  expect(sentGotcha).toBe("");
+  await expect(page.locator("#contact-status")).not.toContainText(
     "could not be accepted",
   );
-  expect(requests).toBe(0);
 });
 
 test("a submit inside the first three seconds is held back", async ({

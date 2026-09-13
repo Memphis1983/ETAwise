@@ -466,16 +466,22 @@ function initContactForm(form) {
     }
     summary.textContent = "";
 
-    // The honeypot is checked again by Formspree, which discards any submission
-    // carrying a filled `_gotcha`. Checking it here saves a round trip and gives
-    // a person caught by it a message they can act on.
-    if (honeypot.value.trim() !== "") {
-      setStatus(
-        "error",
-        `This submission could not be accepted. If you are a person and not a script, please email ${CONTACT_EMAIL} directly.`,
-      );
-      return;
-    }
+    // The honeypot is cleared here rather than rejected on.
+    //
+    // Rejecting a filled `_gotcha` in this path caught real people: password
+    // managers and browser autofill fill off-screen inputs, ignore
+    // `autocomplete="off"`, and cannot see that a field is positioned away from
+    // the viewport. It also caught nothing, because a script that wanted to
+    // bypass this check would post straight to Formspree without running any of
+    // this JavaScript.
+    //
+    // Leaving a filled value in place would be worse still: Formspree would
+    // discard the submission server-side and this page would report a success
+    // that never happened. Clearing it means an autofilled honeypot cannot lose
+    // a real message either way. The field stays in the markup because the
+    // no-JavaScript path still posts it, and Formspree's own honeypot handling
+    // is what guards that route.
+    honeypot.value = "";
     if (Date.now() - loadedAt < MIN_ELAPSED_MS) {
       setStatus(
         "error",
