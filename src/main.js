@@ -132,8 +132,9 @@ const notices = {
     "Website privacy",
     [
       "This preview website has no registration form, analytics scripts, advertising trackers, or non-essential cookies. No signup information is collected. Interactive examples run in your browser and use fictional data.",
-      "Your browser requests the website files from its hosting server. The hosting provider may process connection information such as your IP address and request time according to its configuration and policies.",
-      "Do not submit support records or personal information through this preview. A full privacy notice, operator identity, contact details, and retention terms must be published before registration or product data collection begins.",
+      "The page publishes a contact address, contactus@etawise.tech. That link opens your own email program; nothing is sent or stored by this website. If you do email us, we receive and keep that message, and whatever you choose to put in it, in order to reply.",
+      "Your browser requests the website files from Azure Static Web Apps, a Microsoft hosting service. Microsoft may process connection information such as your IP address and request time according to its configuration and policies.",
+      "Do not send support records or other personal information to us through this preview. A full privacy notice, operator identity, and retention terms must be published before registration or product data collection begins.",
     ],
   ],
   terms: [
@@ -141,7 +142,7 @@ const notices = {
     [
       "ETAwise is an in-development software project. This website is an informational product preview, not a live support service. It does not offer troubleshooting, engineer dispatch, subscriptions, or guaranteed resolution times.",
       "Screens, case details, and AI outputs are illustrative. Planned capabilities may change. No native helpdesk integrations or live AI processing are provided by this website.",
-      "Use of the future product will be subject to separate service terms. Operator identity and business contact details will be published before commercial services or registration are offered.",
+      "Use of the future product will be subject to separate service terms. A contact address is published above; full legal operator identity will be published before commercial services or registration are offered.",
     ],
   ],
 };

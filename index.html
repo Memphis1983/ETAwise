@@ -18,10 +18,14 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ETAwise" />
-    <!-- Image paths are root-relative because no domain is confirmed yet. Some
-    scrapers require an absolute URL, so prefix both with the verified origin
-    once one exists. Regenerate the file with `npm run og:image`. -->
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:url" content="https://www.etawise.tech/" />
+    <meta property="og:locale" content="en_US" />
+    <!-- Social images use the absolute canonical origin because some scrapers
+    reject root-relative paths. Regenerate the file with `npm run og:image`. -->
+    <meta
+      property="og:image"
+      content="https://www.etawise.tech/og-image.png"
+    />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta
@@ -29,7 +33,10 @@
       content="ETAwise logo above the headline Follow-through. Not follow-ups., with the line AI-assisted support operations for helpdesk and technical support teams, and an In development label."
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="/og-image.png" />
+    <meta
+      name="twitter:image"
+      content="https://www.etawise.tech/og-image.png"
+    />
     <meta
       name="twitter:title"
       content="AI-assisted support operations | ETAwise"
@@ -39,6 +46,7 @@
       content="ETAwise turns escalated support tickets into confirmed ownership, next actions, and dated update commitments. In development."
     />
     <title>AI-assisted support operations for escalations | ETAwise</title>
+    <link rel="canonical" href="https://www.etawise.tech/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/src/style.css" />
     <script type="module" src="/src/main.js"></script>
@@ -64,7 +72,9 @@
           },
           {
             "@type": "Organization",
-            "name": "ETAwise"
+            "name": "ETAwise",
+            "url": "https://www.etawise.tech/",
+            "email": "contactus@etawise.tech"
           },
           {
             "@type": "FAQPage",
@@ -638,15 +648,18 @@
             <h3>Something worth<br />following up on.</h3>
             <p>Registration is not open yet.</p>
             <p class="access-small">
-              We're preparing the first release. Signup and contact details will
-              be published here when ready.
+              We're preparing the first release. Signup comes later; you can
+              reach us now at contactus@etawise.tech.
             </p>
-            <!-- Contact link and early-access signup drop in here, replacing
-            the prototype link, once a verified business address and a validated
-            endpoint exist. -->
-            <a href="#preview" class="text-link"
-              >Open the prototype <span aria-hidden="true">&#8599;</span></a
-            >
+            <div class="hero-actions access-actions">
+              <a
+                class="button button-dark"
+                href="mailto:contactus@etawise.tech?subject=ETAwise%20early%20access"
+                >Email us <span aria-hidden="true">&#8599;</span></a
+              ><a href="#preview" class="text-link"
+                >Open the prototype <span aria-hidden="true">&#8599;</span></a
+              >
+            </div>
           </div>
         </div>
       </section>
