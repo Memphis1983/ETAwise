@@ -662,6 +662,142 @@
             </div>
           </div>
         </div>
+        <div class="contact-block">
+          <div class="contact-intro">
+            <p class="micro contact-kicker">
+              <span class="orange-dot"></span> GET IN TOUCH
+            </p>
+            <h3 id="contact-form-title">Send us a message.</h3>
+            <p class="contact-lede">
+              For questions, feedback, or to tell us how escalations stall on
+              your team. This is a contact form, not a signup: it does not
+              create an account or reserve a place, and it does not add you to
+              an early-access list.
+            </p>
+          </div>
+          <p class="contact-summary" id="contact-summary" aria-live="polite"></p>
+          <!-- No `novalidate`: without JavaScript the browser's own constraint
+          validation is the safety net, and the native POST to /api/contact
+          still works. src/main.js switches native validation off once it runs
+          so it can own the messages and their announcements. -->
+          <form
+            class="contact-form"
+            id="contact-form"
+            action="/api/contact"
+            method="post"
+            aria-labelledby="contact-form-title"
+          >
+            <div class="field">
+              <label for="contact-name">Your name</label>
+              <input
+                id="contact-name"
+                name="name"
+                type="text"
+                required
+                minlength="2"
+                maxlength="80"
+                autocomplete="name"
+                autocapitalize="words"
+              />
+              <p class="field-error" id="contact-name-error" hidden>
+                <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                ><span class="field-error-text"></span>
+              </p>
+            </div>
+            <div class="field">
+              <label for="contact-email">Your email address</label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                required
+                maxlength="254"
+                autocomplete="email"
+                autocapitalize="none"
+                spellcheck="false"
+                aria-describedby="contact-email-hint"
+              />
+              <p class="field-hint" id="contact-email-hint">
+                We reply to this address. Nothing else is sent to it.
+              </p>
+              <p class="field-error" id="contact-email-error" hidden>
+                <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                ><span class="field-error-text"></span>
+              </p>
+            </div>
+            <div class="field">
+              <label for="contact-message">Your message</label>
+              <textarea
+                id="contact-message"
+                name="message"
+                rows="5"
+                required
+                minlength="10"
+                maxlength="2000"
+                aria-describedby="contact-message-hint"
+              ></textarea>
+              <p class="field-hint" id="contact-message-hint">
+                Between 10 and 2000 characters.
+              </p>
+              <p class="field-error" id="contact-message-error" hidden>
+                <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                ><span class="field-error-text"></span>
+              </p>
+            </div>
+            <div class="field field-consent">
+              <div class="consent-row">
+                <input
+                  id="contact-consent"
+                  name="consent"
+                  type="checkbox"
+                  value="yes"
+                  required
+                />
+                <label for="contact-consent"
+                  >Submitting this form sends my name, email address, and
+                  message to ETAwise, and ETAwise stores them in order to
+                  reply.</label
+                >
+              </div>
+              <p class="field-error" id="contact-consent-error" hidden>
+                <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                ><span class="field-error-text"></span>
+              </p>
+            </div>
+            <div class="offscreen-field" aria-hidden="true">
+              <label for="contact-website">Website</label>
+              <input
+                id="contact-website"
+                name="website"
+                type="text"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+            <input type="hidden" name="ts" id="contact-ts" value="" />
+            <div class="contact-actions">
+              <button class="button button-dark" type="submit">
+                <span class="button-label">Send message</span
+                ><span aria-hidden="true">&#8599;</span>
+              </button>
+              <p class="contact-footnote">
+                Rather use your own mail client? Write to
+                <a href="mailto:contactus@etawise.tech?subject=ETAwise%20enquiry"
+                  >contactus@etawise.tech</a
+                >.
+              </p>
+            </div>
+          </form>
+          <p
+            class="contact-status"
+            id="contact-status"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="contact-status-mark" aria-hidden="true"></span
+            ><span class="contact-status-text"></span>
+          </p>
+        </div>
       </section>
     </main>
     <footer class="wrap footer">

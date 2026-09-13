@@ -5,6 +5,9 @@
   --line: #dcded3;
   --accent: #d74b27;
   --orange: #ee603b;
+  /* Darker than --accent on purpose: the accent only reaches 3.5:1 on the
+     #e8eadd early-access panel, which fails AA for the small error text. */
+  --error: #8f2f13;
   --white: #fffefa;
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "DM Sans Variable", Arial, sans-serif;
@@ -1943,7 +1946,11 @@ dialog p:last-child {
   line-height: 1.6;
 }
 .header nav a[aria-current="true"] {
-  color: var(--accent);
+  /* Not --accent. At 15px on --paper the accent is 3.84:1, which fails AA, and
+     this is a persistent state rather than a hover, so axe catches it as soon
+     as the page is scrolled far enough for a section to become current.
+     #a83a1c is the same hue at 5.76:1. */
+  color: #a83a1c;
   text-decoration: underline;
   text-underline-offset: 6px;
 }
@@ -2013,5 +2020,272 @@ dialog p:last-child {
   .header nav {
     left: -32px;
     right: -32px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Contact form. Lives inside the early-access panel (#e8eadd), so the form
+   itself sits on a --white card the way .workspace does, and every colour is
+   checked against that card rather than the page paper.
+   --------------------------------------------------------------------------- */
+.contact-block {
+  border-top: 1px solid #c5cdb8;
+  margin-top: 44px;
+  padding-top: 34px;
+}
+.contact-intro {
+  max-width: 620px;
+  margin-bottom: 24px;
+}
+.contact-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: #59624e;
+  margin: 0;
+}
+.contact-block h3 {
+  font-size: 23px;
+  letter-spacing: -0.6px;
+  font-weight: 500;
+  margin: 14px 0 12px;
+}
+.contact-lede {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4c5445;
+  margin: 0;
+}
+.contact-form {
+  position: relative;
+  max-width: 620px;
+  background: var(--white);
+  border: 1px solid #ccd2c2;
+  border-radius: 6px;
+  padding: 28px 30px;
+  display: grid;
+  gap: 22px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.contact-form label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.contact-form input:not([type="checkbox"]),
+.contact-form textarea {
+  /* 16px minimum: iOS Safari zooms the viewport on focus below that. */
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 14px;
+  background: #faf9f4;
+  border: 1px solid #c4cbb6;
+  border-radius: 4px;
+}
+.contact-form textarea {
+  resize: vertical;
+  min-height: 128px;
+}
+/* The site uses a 3px accent ring at 5px offset for links and buttons. Inputs
+   keep the ring and weight but tighten the offset, because at 5px the ring of
+   one field overlaps the label of the next. */
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-color: #8f9a80;
+}
+.field-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+/* Error state is carried by three signals, not one: the leading warning glyph,
+   the message text itself, and a thicker left edge on the control. Colour is
+   the fourth signal, never the only one. */
+.field-error {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--error);
+}
+.field-error[hidden] {
+  display: none;
+}
+.field-error-mark {
+  font-size: 14px;
+  line-height: 1.45;
+  flex-shrink: 0;
+}
+.field-invalid input:not([type="checkbox"]),
+.field-invalid textarea {
+  border-color: var(--error);
+  border-left-width: 3px;
+  background: #fdf5f2;
+}
+.consent-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.consent-row input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.consent-row label {
+  font-weight: 400;
+  line-height: 1.6;
+}
+.field-consent.field-invalid .consent-row input {
+  outline: 2px solid var(--error);
+  outline-offset: 3px;
+}
+/* Off-screen rather than display:none, and aria-hidden with tabindex="-1" so
+   neither sighted users nor assistive technology ever reach it. Positioned
+   against the form, not the page, so it cannot widen the document. */
+.offscreen-field {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.offscreen-field input {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+}
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+}
+.contact-form button[type="submit"] {
+  border: 0;
+  gap: 20px;
+}
+.contact-form button[type="submit"][disabled] {
+  cursor: progress;
+  opacity: 0.72;
+  transform: none;
+}
+.contact-footnote {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.contact-footnote a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.contact-footnote a:hover {
+  color: var(--accent);
+}
+.contact-summary {
+  max-width: 620px;
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--error);
+}
+.contact-summary:empty {
+  display: none;
+}
+.contact-status {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  max-width: 620px;
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.contact-status:not([data-state]) {
+  display: none;
+}
+.contact-status-mark {
+  flex-shrink: 0;
+}
+.contact-status[data-state="error"] {
+  color: var(--error);
+  font-weight: 500;
+}
+.contact-status[data-state="pending"] {
+  color: #4c5445;
+}
+.contact-status[data-state="success"] {
+  color: #35502a;
+  font-weight: 500;
+}
+.contact-confirmation {
+  max-width: 620px;
+  background: var(--white);
+  border: 1px solid #ccd2c2;
+  border-left: 3px solid #55674c;
+  border-radius: 6px;
+  padding: 26px 28px;
+}
+.contact-confirmation:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+.contact-confirmation h4 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  margin: 0 0 10px;
+}
+.contact-confirmation p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4c5445;
+  margin: 0;
+}
+.contact-confirmation p + p {
+  margin-top: 12px;
+}
+@media (max-width: 540px) {
+  .contact-block {
+    margin-top: 34px;
+    padding-top: 27px;
+  }
+  .contact-block h3 {
+    font-size: 22px;
+  }
+  .contact-form {
+    padding: 20px 18px;
+    gap: 20px;
+  }
+  .contact-confirmation {
+    padding: 22px 18px;
+  }
+  .contact-actions {
+    gap: 14px 18px;
+  }
+  .contact-form button[type="submit"] {
+    width: 100%;
   }
 }

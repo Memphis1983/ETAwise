@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "playwright test",
+    "csp:check": "node scripts/check-csp.mjs",
     "og:image": "node scripts/generate-og-image.mjs"
   },
   "devDependencies": {
