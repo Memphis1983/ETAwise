@@ -5,6 +5,9 @@
   --line: #dcded3;
   --accent: #d74b27;
   --orange: #ee603b;
+  /* Darker than --accent on purpose: the accent only reaches 3.5:1 on the
+     #e8eadd early-access panel, which fails AA for the small error text. */
+  --error: #8f2f13;
   --white: #fffefa;
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "DM Sans Variable", Arial, sans-serif;
@@ -21,7 +24,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
 }
 a {
@@ -74,12 +77,12 @@ h2 {
   margin-bottom: 24px;
 }
 .micro {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 1.3px;
   font-weight: 600;
 }
 .eyebrow {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 1.6px;
   display: flex;
@@ -90,7 +93,7 @@ h2 {
 .eyebrow > span:first-child:not(.orange-dot) {
   color: var(--muted);
   font-family: monospace;
-  font-size: 11px;
+  font-size: 13px;
 }
 .status-dot,
 .orange-dot,
@@ -134,9 +137,9 @@ h2 {
 .brand {
   display: inline-flex;
   align-items: center;
-  font-size: 27px;
+  font-size: 32px;
   font-weight: 700;
-  letter-spacing: -1.4px;
+  letter-spacing: -1.66px;
 }
 .brand-light {
   font-weight: 450;
@@ -147,23 +150,23 @@ h2 {
 .brand-mark {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-right: 10px;
+  gap: 5px;
+  margin-right: 12px;
   transform: skewY(-12deg);
 }
 .brand-mark i {
   display: block;
-  width: 21px;
-  height: 4px;
+  width: 25px;
+  height: 5px;
   background: var(--accent);
 }
 .brand-mark i:nth-child(2) {
-  width: 15px;
+  width: 18px;
 }
 .header nav {
   display: flex;
   gap: 31px;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
 }
 .header nav a:hover,
@@ -172,7 +175,7 @@ h2 {
   color: var(--accent);
 }
 .nav-cta {
-  font-size: 12px;
+  font-size: 14px;
   border: 1px solid #bfc2b6;
   border-radius: 5px;
   padding: 12px 17px;
@@ -196,13 +199,13 @@ h2 {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 9px;
+  font-size: 11px;
   letter-spacing: 1.4px;
   font-weight: 600;
 }
 .hero-kicker > span:last-child {
   letter-spacing: 0;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--muted);
   font-weight: 400;
 }
@@ -239,7 +242,7 @@ h1 .serif {
 .hero-detail {
   max-width: 445px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.8;
   margin-bottom: 28px;
 }
@@ -254,7 +257,7 @@ h1 .serif {
   justify-content: space-between;
   gap: 32px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   padding: 17px 20px;
   min-height: 48px;
@@ -271,7 +274,7 @@ h1 .serif {
   transform: translateY(-2px);
 }
 .text-link {
-  font-size: 12px;
+  font-size: 14px;
   display: inline-flex;
   gap: 16px;
   align-items: center;
@@ -283,7 +286,7 @@ h1 .serif {
   align-items: center;
   margin-top: 31px;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 .tiny-cross {
   color: var(--accent);
@@ -311,11 +314,11 @@ h1 .serif {
   top: 22px;
 }
 .visual-top .micro {
-  font-size: 8px;
+  font-size: 10px;
 }
 .visual-bottom {
   bottom: 20px;
-  font-size: 7px;
+  font-size: 9px;
   letter-spacing: 1.8px;
 }
 .orbit {
@@ -324,7 +327,10 @@ h1 .serif {
   border-radius: 50%;
   left: 50%;
   top: 47%;
-  transform: translate(-50%, -50%) rotate(-27deg);
+  /* Centring moved to the independent translate property so the rotation
+     keyframes below only have to carry the angle. */
+  translate: -50% -50%;
+  transform: rotate(-27deg);
 }
 .orbit-one {
   width: 208px;
@@ -350,12 +356,64 @@ h1 .serif {
   background: #8e9885;
   box-sizing: content-box;
 }
+/* Ambient drift. Only the marked rings are animated: a uniform circle looks
+   identical at every angle, so rotating orbit-one would be invisible work.
+   The two marked rings turn at different speeds, in opposite directions. */
+.orbit-two {
+  animation: orbit-drift-reverse 78s linear infinite;
+}
+.orbit-three {
+  animation: orbit-drift 90s linear infinite;
+}
+/* Marker on the outer ring, placed with percentages so it stays on the
+   circumference when the ring is resized at narrow widths. 210deg. */
+.orbit-three:after {
+  content: "";
+  position: absolute;
+  left: calc(6.7% - 6px);
+  top: calc(25% - 6px);
+  width: 6px;
+  height: 6px;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: #a3ab98;
+  box-sizing: content-box;
+}
+@keyframes orbit-drift {
+  from {
+    transform: rotate(-27deg);
+  }
+  to {
+    transform: rotate(333deg);
+  }
+}
+@keyframes orbit-drift-reverse {
+  from {
+    transform: rotate(-27deg);
+  }
+  to {
+    transform: rotate(-387deg);
+  }
+}
+/* Was a dashed border. A repeating gradient of the same weight can carry a
+   slow downward flow through background-position. */
 .signal-line {
   position: absolute;
   left: 50%;
   top: 80px;
   height: 208px;
-  border-left: 1px dashed #a9ae9c;
+  width: 1px;
+  background: repeating-linear-gradient(#a9ae9c 0 3px, transparent 3px 7px);
+  background-size: 1px 7px;
+  animation: signal-flow 7s linear infinite;
+}
+@keyframes signal-flow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 7px;
+  }
 }
 .handoff-label {
   position: absolute;
@@ -364,7 +422,7 @@ h1 .serif {
   transform: translateX(-50%);
   background: #efeee6;
   padding: 8px 11px;
-  font-size: 8px;
+  font-size: 10px;
   white-space: nowrap;
   letter-spacing: 1px;
   display: flex;
@@ -376,7 +434,10 @@ h1 .serif {
   position: absolute;
   left: 50%;
   top: 46%;
-  transform: translate(-50%, -50%) rotate(-8deg);
+  /* Centring lives on translate so the float keyframes own transform and the
+     hover state owns scale. Three properties, no fighting over one. */
+  translate: -50% -50%;
+  transform: rotate(-8deg);
   height: 90px;
   width: 90px;
   background: linear-gradient(145deg, #fc8155, #df4b26);
@@ -387,6 +448,39 @@ h1 .serif {
     inset 0 2px 1px #ffac85;
   display: grid;
   place-items: center;
+  animation: core-float 7s ease-in-out infinite alternate;
+  transition: scale 240ms ease-out;
+}
+@keyframes core-float {
+  from {
+    transform: rotate(-8deg) translateY(0);
+    box-shadow:
+      0 16px 28px #8e694330,
+      inset 0 2px 1px #ffac85;
+  }
+  to {
+    transform: rotate(-8deg) translateY(-6px);
+    box-shadow:
+      0 22px 36px #8e694326,
+      inset 0 2px 1px #ffac85;
+  }
+}
+/* Hover shadow sits on its own layer, so deepening it does not collide with
+   the box-shadow the float animation is already driving. */
+.signal-core:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 18px 30px #8e694300;
+  transition: box-shadow 240ms ease-out;
+  pointer-events: none;
+}
+.signal-core:hover {
+  scale: 1.05;
+}
+.signal-core:hover:after {
+  box-shadow: 0 26px 44px #8e694338;
 }
 .core-symbol {
   font-family: var(--serif);
@@ -395,6 +489,13 @@ h1 .serif {
   line-height: 1;
   color: #fff8e8;
   transform: translateY(-8px);
+  transition:
+    rotate 240ms ease-out,
+    scale 240ms ease-out;
+}
+.signal-core:hover .core-symbol {
+  rotate: -6deg;
+  scale: 1.06;
 }
 .signal-note {
   position: absolute;
@@ -405,7 +506,7 @@ h1 .serif {
   display: flex;
   gap: 7px;
   align-items: center;
-  font-size: 11px;
+  font-size: 13px;
   background: #eeeee5;
   padding: 5px 8px;
 }
@@ -422,6 +523,13 @@ h1 .serif {
   gap: 11px;
   padding: 16px 14px;
   box-shadow: 0 8px 20px #333b2010;
+  transition:
+    transform 240ms ease-out,
+    box-shadow 240ms ease-out;
+}
+.action-slip:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 26px #333b2018;
 }
 .slip-check {
   border: 1px solid #ccd3be;
@@ -434,12 +542,12 @@ h1 .serif {
   place-items: center;
 }
 .action-slip .micro {
-  font-size: 7px;
+  font-size: 9px;
   color: var(--muted);
 }
 .action-slip strong {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   margin-top: 5px;
 }
@@ -456,15 +564,15 @@ h1 .serif {
   gap: 20px;
   align-items: center;
   min-height: 80px;
-  font-size: 11px;
+  font-size: 13px;
 }
 .strip-inner > span:first-child {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 .strip-inner b {
   font-family: monospace;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 400;
   color: #74796b;
   margin-right: 10px;
@@ -485,7 +593,7 @@ h1 .serif {
 .section-heading > div > p {
   max-width: 520px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 15px;
   margin-bottom: 0;
 }
 .contrast-grid {
@@ -512,7 +620,7 @@ h1 .serif {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 9px;
+  font-size: 11px;
 }
 .message-line {
   display: flex;
@@ -522,12 +630,12 @@ h1 .serif {
   border-bottom: 1px solid #e1e1d7;
 }
 .message-line p {
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
 }
 .message-line > span:last-child {
   margin-left: auto;
-  font-size: 8px;
+  font-size: 10px;
   color: var(--muted);
   letter-spacing: 0.8px;
 }
@@ -537,7 +645,7 @@ h1 .serif {
 .contrast-caption {
   margin: 20px 0 0;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 .clarity-side dl {
   margin: 0;
@@ -549,7 +657,7 @@ h1 .serif {
   min-height: 44px;
   align-items: center;
   border-bottom: 1px solid #e1e1d7;
-  font-size: 12px;
+  font-size: 14px;
 }
 .clarity-side dt {
   color: var(--muted);
@@ -578,14 +686,14 @@ h1 .serif {
   margin: 20px 0 0;
 }
 .preview-heading > p {
-  font-size: 12px;
+  font-size: 14px;
   max-width: 370px;
   color: #5a6152;
   margin-bottom: 4px;
 }
 .preview-disclaimer {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 7px;
 }
 .workspace {
@@ -607,7 +715,7 @@ h1 .serif {
   display: flex;
   gap: 13px;
   align-items: center;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
 }
 .workspace-brand > span:not(.mini-mark) {
@@ -627,7 +735,7 @@ h1 .serif {
   padding-bottom: 6px;
 }
 .prototype-pill {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 1px;
   border: 1px solid #daddd2;
   padding: 5px 8px;
@@ -648,7 +756,7 @@ h1 .serif {
   gap: 9px;
 }
 .case-sidebar > p {
-  font-size: 8px;
+  font-size: 10px;
   color: #676d5c;
   margin: 0 10px 12px;
   display: flex;
@@ -678,11 +786,11 @@ h1 .serif {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  font-size: 9px;
+  font-size: 11px;
   color: #606858;
 }
 .case-state {
-  font-size: 8px;
+  font-size: 10px;
   padding: 4px 6px;
   border-radius: 3px;
   font-weight: 500;
@@ -701,19 +809,19 @@ h1 .serif {
 }
 .case-button strong {
   display: block;
-  font-size: 11px;
+  font-size: 13px;
   margin: 13px 0 6px;
   font-weight: 500;
 }
 .case-sub {
-  font-size: 9px;
+  font-size: 11px;
   color: #6e7366;
 }
 .sidebar-bottom {
   display: flex;
   gap: 7px;
   align-items: center;
-  font-size: 9px;
+  font-size: 11px;
   color: #707566;
   margin: auto 10px 0;
   padding-top: 22px;
@@ -725,7 +833,7 @@ h1 .serif {
 .case-breadcrumb {
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
+  font-size: 11px;
   color: #68705f;
   margin-bottom: 22px;
 }
@@ -739,7 +847,7 @@ h1 .serif {
   margin-bottom: 10px;
 }
 .case-detail > p {
-  font-size: 11px;
+  font-size: 13px;
   color: #686e60;
   max-width: 490px;
   min-height: 40px;
@@ -755,13 +863,13 @@ h1 .serif {
 }
 .case-metrics span {
   display: block;
-  font-size: 8px;
+  font-size: 10px;
   color: #666e5e;
   letter-spacing: 1px;
   margin-bottom: 8px;
 }
 .case-metrics strong {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
 }
 .ai-insight {
@@ -773,12 +881,12 @@ h1 .serif {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 .insight-heading > span:last-child {
   margin-left: auto;
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.6px;
   color: #656f5a;
@@ -788,7 +896,7 @@ h1 .serif {
   font-size: 15px;
 }
 .ai-insight p {
-  font-size: 11px;
+  font-size: 13px;
   color: #5b6650;
   margin: 10px 0 4px;
   min-height: 38px;
@@ -798,7 +906,7 @@ h1 .serif {
   border: 0;
   border-bottom: 1px solid #aab797;
   padding: 8px 0;
-  font-size: 9px;
+  font-size: 11px;
   display: inline-flex;
   gap: 12px;
   align-items: center;
@@ -808,7 +916,7 @@ h1 .serif {
   color: #30571a;
 }
 .human-review {
-  font-size: 9px;
+  font-size: 11px;
   color: #68705f;
   margin-top: 16px;
   display: flex;
@@ -820,7 +928,7 @@ h1 .serif {
   justify-content: space-between;
   gap: 20px;
   padding: 13px 25px;
-  font-size: 8px;
+  font-size: 10px;
   color: #666e5e;
 }
 .workspace-footer > span:first-child {
@@ -831,7 +939,7 @@ h1 .serif {
 .preview-caption {
   text-align: center;
   color: #5b6553;
-  font-size: 10px;
+  font-size: 12px;
   margin: 22px 0 0;
 }
 .steps {
@@ -862,12 +970,12 @@ h1 .serif {
   margin-bottom: 12px;
 }
 .steps p {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   margin-bottom: 28px;
 }
 .step-tag {
-  font-size: 8px;
+  font-size: 10px;
   color: #707667;
   letter-spacing: 1.1px;
 }
@@ -896,14 +1004,14 @@ h1 .serif {
 }
 .ai-intro {
   color: #c0c7b6;
-  font-size: 13px;
+  font-size: 15px;
   margin: 25px 0 33px;
 }
 .development-label {
   display: flex;
   gap: 8px;
   align-items: center;
-  font-size: 9px;
+  font-size: 11px;
   color: #c1c7b8;
 }
 .ai-principles article {
@@ -919,7 +1027,7 @@ h1 .serif {
 .ai-principles article > span {
   color: #b8c4a5;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
   padding-top: 5px;
 }
@@ -931,7 +1039,7 @@ h1 .serif {
 }
 .ai-principles p {
   color: #c0c7b6;
-  font-size: 12px;
+  font-size: 14px;
   margin-bottom: 0;
 }
 .faq-section {
@@ -955,7 +1063,7 @@ summary {
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   line-height: 1.5;
 }
@@ -971,7 +1079,7 @@ details[open] summary > span {
   transform: rotate(45deg);
 }
 details p {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
   padding-right: 30px;
   margin-bottom: 23px;
@@ -992,7 +1100,7 @@ details p {
   margin: 0;
 }
 .access-stage {
-  font-size: 9px;
+  font-size: 11px;
   color: #626c54;
 }
 .access-grid {
@@ -1006,7 +1114,7 @@ details p {
   margin-bottom: 20px;
 }
 .access-grid > div > p {
-  font-size: 12px;
+  font-size: 14px;
   color: #5d6652;
   margin-bottom: 0;
 }
@@ -1015,7 +1123,7 @@ details p {
   padding-left: 37px;
 }
 .access-note .micro {
-  font-size: 8px;
+  font-size: 10px;
   color: #657057;
 }
 .access-note h3 {
@@ -1025,13 +1133,13 @@ details p {
   margin: 15px 0;
 }
 .access-note p {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.6;
   margin-bottom: 5px;
   color: #435039;
 }
 .access-note .access-small {
-  font-size: 10px;
+  font-size: 12px;
   color: #647057;
   margin-bottom: 10px;
 }
@@ -1043,21 +1151,21 @@ details p {
   align-items: flex-end;
 }
 .footer .brand {
-  font-size: 24px;
+  font-size: 28px;
 }
 .footer .brand-mark {
   transform: scale(0.85) skewY(-12deg);
-  margin-right: 6px;
+  margin-right: 7px;
 }
 .footer p {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
   margin: 12px 0 0;
 }
 .footer-meta {
   text-align: right;
   color: #6a7160;
-  font-size: 9px;
+  font-size: 11px;
 }
 .footer-meta > div {
   display: flex;
@@ -1070,7 +1178,7 @@ details p {
   border: 0;
   background: none;
   padding: 10px 0;
-  font-size: 9px;
+  font-size: 11px;
 }
 .footer a:not(.brand):hover {
   text-decoration: underline;
@@ -1115,7 +1223,7 @@ dialog h2 {
   letter-spacing: -1px;
 }
 dialog p {
-  font-size: 13px;
+  font-size: 15px;
   color: #565d4d;
 }
 dialog p:last-child {
@@ -1151,19 +1259,19 @@ dialog p:last-child {
     font-size: 16px;
   }
   .hero-detail {
-    font-size: 12px;
+    font-size: 14px;
   }
   .hero-actions {
     gap: 15px;
   }
   .hero-actions .text-link {
-    font-size: 10px;
+    font-size: 12px;
   }
   .hero-visual {
     height: 405px;
   }
   .strip-inner {
-    font-size: 10px;
+    font-size: 12px;
     gap: 12px;
   }
   .strip-inner > span:first-child {
@@ -1205,17 +1313,13 @@ dialog p:last-child {
   .header {
     height: 80px;
   }
-  .header nav {
-    gap: 16px;
-    font-size: 10px;
-  }
   .nav-cta {
     padding: 11px 13px;
-    font-size: 10px;
+    font-size: 12px;
     gap: 12px;
   }
   .brand {
-    font-size: 24px;
+    font-size: 28px;
   }
   .hero {
     padding-block: 35px 45px;
@@ -1253,7 +1357,7 @@ dialog p:last-child {
     top: 16px;
   }
   .hero-actions .text-link {
-    font-size: 12px;
+    font-size: 14px;
   }
   .strip-inner {
     display: grid;
@@ -1316,10 +1420,10 @@ dialog p:last-child {
   .case-state {
     display: inline-block;
     margin-top: 7px;
-    font-size: 8px;
+    font-size: 10px;
   }
   .case-button strong {
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.5;
     margin: 10px 0 0;
   }
@@ -1345,7 +1449,7 @@ dialog p:last-child {
     font-size: 17px;
   }
   .steps p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .ai-section {
     padding-block: 60px;
@@ -1404,7 +1508,7 @@ dialog p:last-child {
     height: 75px;
   }
   .brand {
-    font-size: 25px;
+    font-size: 30px;
   }
   .menu-toggle {
     display: flex;
@@ -1434,7 +1538,7 @@ dialog p:last-child {
     background: var(--paper);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 12px 15px #25282008;
-    font-size: 13px;
+    font-size: 15px;
   }
   .header nav.open {
     display: flex;
@@ -1447,16 +1551,16 @@ dialog p:last-child {
   .nav-cta {
     gap: 10px;
     padding: 11px 12px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .hero-kicker {
     gap: 7px;
-    font-size: 7px;
+    font-size: 9px;
     letter-spacing: 1px;
     flex-wrap: wrap;
   }
   .hero-kicker > span:last-child {
-    font-size: 9px;
+    font-size: 11px;
   }
   .kicker-rule {
     width: 15px;
@@ -1480,7 +1584,7 @@ dialog p:last-child {
     display: none;
   }
   .hero-detail {
-    font-size: 12px;
+    font-size: 14px;
     margin-bottom: 22px;
   }
   .hero-actions {
@@ -1488,15 +1592,15 @@ dialog p:last-child {
     flex-wrap: wrap;
   }
   .hero-actions .text-link {
-    font-size: 11px;
+    font-size: 13px;
   }
   .button {
     padding: 15px 17px;
-    font-size: 11px;
+    font-size: 13px;
     gap: 20px;
   }
   .hero-footnote {
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 19px;
   }
   .hero-visual {
@@ -1504,7 +1608,7 @@ dialog p:last-child {
   }
   .signal-note {
     top: 213px;
-    font-size: 10px;
+    font-size: 12px;
   }
   .action-slip {
     bottom: 42px;
@@ -1518,7 +1622,7 @@ dialog p:last-child {
     right: 16px;
   }
   .visual-top .micro {
-    font-size: 7px;
+    font-size: 9px;
   }
   .orbit-three {
     width: 390px;
@@ -1534,19 +1638,19 @@ dialog p:last-child {
   }
   .visual-bottom {
     bottom: 17px;
-    font-size: 6px;
+    font-size: 8px;
   }
   .strip-inner {
     column-gap: 10px;
     row-gap: 20px;
-    font-size: 9px;
+    font-size: 11px;
   }
   .strip-inner > span:first-child {
-    font-size: 9px;
+    font-size: 11px;
   }
   .strip-inner b {
     margin-right: 6px;
-    font-size: 8px;
+    font-size: 10px;
   }
   h2 {
     font-size: 37px;
@@ -1556,44 +1660,44 @@ dialog p:last-child {
     padding-block: 53px;
   }
   .eyebrow {
-    font-size: 8px;
+    font-size: 10px;
     letter-spacing: 1.3px;
   }
   .section-heading > div > p {
-    font-size: 12px;
+    font-size: 14px;
   }
   .activity-side,
   .clarity-side {
     padding: 23px 20px 20px;
   }
   .message-line p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .clarity-side dl > div {
-    font-size: 10px;
+    font-size: 12px;
   }
   .panel-label {
-    font-size: 8px;
+    font-size: 10px;
   }
   .preview-heading h2 {
     font-size: 39px;
   }
   .preview-heading > p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .preview-disclaimer {
-    font-size: 9px;
+    font-size: 11px;
   }
   .workspace-top {
     padding: 0 13px;
     height: 50px;
   }
   .workspace-brand {
-    font-size: 9px;
+    font-size: 11px;
     gap: 8px;
   }
   .prototype-pill {
-    font-size: 6px;
+    font-size: 8px;
     padding: 5px;
     letter-spacing: 0.6px;
   }
@@ -1610,13 +1714,13 @@ dialog p:last-child {
     padding: 8px 6px;
   }
   .case-button strong {
-    font-size: 9px;
+    font-size: 11px;
   }
   .case-button-top {
-    font-size: 8px;
+    font-size: 10px;
   }
   .case-state {
-    font-size: 7px;
+    font-size: 9px;
     padding: 4px;
   }
   .case-detail {
@@ -1626,42 +1730,42 @@ dialog p:last-child {
     font-size: 20px;
   }
   .case-detail > p {
-    font-size: 11px;
+    font-size: 13px;
     min-height: 60px;
   }
   .case-breadcrumb {
-    font-size: 8px;
-  }
-  .case-metrics strong {
     font-size: 10px;
   }
+  .case-metrics strong {
+    font-size: 12px;
+  }
   .case-metrics span {
-    font-size: 7px;
+    font-size: 9px;
   }
   .ai-insight {
     padding: 13px;
   }
   .insight-heading {
-    font-size: 9px;
+    font-size: 11px;
   }
   .insight-heading > span:last-child {
-    font-size: 6px;
+    font-size: 8px;
     letter-spacing: 0;
   }
   .ai-insight p {
-    font-size: 10px;
+    font-size: 12px;
     min-height: 52px;
   }
   .human-review {
-    font-size: 8px;
+    font-size: 10px;
     line-height: 1.6;
   }
   .workspace-footer {
-    font-size: 7px;
+    font-size: 9px;
     line-height: 1.6;
   }
   .preview-caption {
-    font-size: 9px;
+    font-size: 11px;
     max-width: 290px;
     margin-inline: auto;
   }
@@ -1677,23 +1781,23 @@ dialog p:last-child {
     font-size: 21px;
   }
   .steps p {
-    font-size: 12px;
+    font-size: 14px;
     margin-bottom: 17px;
   }
   .step-tag {
-    font-size: 8px;
+    font-size: 10px;
   }
   .ai-section h2 {
     font-size: 39px;
   }
   .ai-intro {
-    font-size: 12px;
+    font-size: 14px;
   }
   .ai-principles h3 {
     font-size: 16px;
   }
   .ai-principles p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .ai-principles article {
     gap: 15px;
@@ -1702,11 +1806,11 @@ dialog p:last-child {
     gap: 8px;
   }
   summary {
-    font-size: 12px;
+    font-size: 14px;
     padding: 20px 0;
   }
   details p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .access-section {
     padding: 23px;
@@ -1724,13 +1828,13 @@ dialog p:last-child {
     display: none;
   }
   .access-grid > div > p {
-    font-size: 11px;
+    font-size: 13px;
   }
   .access-note h3 {
     font-size: 22px;
   }
   .access-note .access-small {
-    font-size: 11px;
+    font-size: 13px;
   }
   .footer {
     display: block;
@@ -1750,7 +1854,7 @@ dialog p:last-child {
     margin-right: auto;
   }
   .footer .brand {
-    font-size: 25px;
+    font-size: 30px;
   }
   dialog {
     padding: 23px;
@@ -1767,6 +1871,15 @@ dialog p:last-child {
 .access-note .access-small {
   color: #59624e;
 }
+/* Below 540px both ring radii cross the hero micro-label rows, so a travelling
+   marker can read as a stray dot between them. Park the rings at their base
+   angle on small screens; ambient drift is a large-canvas effect anyway. */
+@media (max-width: 540px) {
+  .orbit-two,
+  .orbit-three {
+    animation: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -1776,5 +1889,403 @@ dialog p:last-child {
   *::after {
     transition: none !important;
     animation: none !important;
+  }
+  /* Named explicitly as well as caught by the wildcard above, so the hero
+     visual's motion is auditable selector by selector. Hover states drop
+     their movement here and keep only the shadow as the affordance. */
+  .orbit-two,
+  .orbit-three,
+  .signal-line,
+  .signal-core,
+  .signal-core:after,
+  .core-symbol,
+  .action-slip {
+    animation: none;
+    transition: none;
+  }
+  .signal-core:hover {
+    scale: 1;
+  }
+  .signal-core:hover .core-symbol {
+    rotate: 0deg;
+    scale: 1;
+  }
+  .action-slip:hover {
+    transform: none;
+  }
+}
+.hero-lede {
+  max-width: 460px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.1px;
+  color: #4c5445;
+  margin-bottom: 18px;
+}
+.h2-clause {
+  display: block;
+  max-width: 480px;
+  margin-top: 16px;
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: -0.1px;
+  color: #565f4d;
+}
+.workspace-notice {
+  margin: 0;
+  padding: 9px 25px;
+  border-bottom: 1px solid #e3e6db;
+  background: #f7f8f3;
+  color: #59624e;
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  line-height: 1.6;
+}
+.header nav a[aria-current="true"] {
+  /* Not --accent. At 15px on --paper the accent is 3.84:1, which fails AA, and
+     this is a persistent state rather than a hover, so axe catches it as soon
+     as the page is scrolled far enough for a section to become current.
+     #a83a1c is the same hue at 5.76:1. */
+  color: #a83a1c;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+@media (max-width: 540px) {
+  .hero-lede {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  .h2-clause {
+    font-size: 16px;
+    margin-top: 13px;
+  }
+  .workspace-notice {
+    padding-inline: 13px;
+  }
+}
+/* Five nav items do not fit inline between 541px and ~595px, so the existing
+   hamburger pattern now covers that band as well. Raised to 920px when the nav
+   went to 15px: at 921px the five links still clear the logo and the CTA by
+   ~30px, which is the tightest inline gap this header had before. Below that
+   they collide and the labels wrap. */
+@media (max-width: 920px) and (min-width: 541px) {
+  .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    margin-left: auto;
+    margin-right: 10px;
+  }
+  .menu-toggle span {
+    width: 20px;
+    height: 1px;
+    background: var(--ink);
+    margin-inline: auto;
+  }
+  .header nav {
+    display: none;
+    position: absolute;
+    /* Header height varies across this band (100px, then 80px below 800px),
+       so the panel is anchored to the header instead of a fixed offset. */
+    top: calc(100% - 1px);
+    left: -20px;
+    right: -20px;
+    padding: 20px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 12px 15px #25282008;
+    font-size: 15px;
+  }
+  .header nav.open {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .header nav a {
+    padding: 13px 0;
+  }
+}
+/* The wrap is inset by 32px above 800px, so the dropdown needs the wider
+   negative offset to stay full-bleed. */
+@media (max-width: 920px) and (min-width: 801px) {
+  .header nav {
+    left: -32px;
+    right: -32px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Contact form. Lives inside the early-access panel (#e8eadd), so the form
+   itself sits on a --white card the way .workspace does, and every colour is
+   checked against that card rather than the page paper.
+   --------------------------------------------------------------------------- */
+.contact-block {
+  border-top: 1px solid #c5cdb8;
+  margin-top: 44px;
+  padding-top: 34px;
+}
+.contact-intro {
+  max-width: 620px;
+  margin-bottom: 24px;
+}
+.contact-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: #59624e;
+  margin: 0;
+}
+.contact-block h3 {
+  font-size: 23px;
+  letter-spacing: -0.6px;
+  font-weight: 500;
+  margin: 14px 0 12px;
+}
+.contact-lede {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4c5445;
+  margin: 0;
+}
+.contact-form {
+  position: relative;
+  max-width: 620px;
+  background: var(--white);
+  border: 1px solid #ccd2c2;
+  border-radius: 6px;
+  padding: 28px 30px;
+  display: grid;
+  gap: 22px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.contact-form label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.contact-form input:not([type="checkbox"]),
+.contact-form textarea {
+  /* 16px minimum: iOS Safari zooms the viewport on focus below that. */
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 14px;
+  background: #faf9f4;
+  border: 1px solid #c4cbb6;
+  border-radius: 4px;
+}
+.contact-form textarea {
+  resize: vertical;
+  min-height: 128px;
+}
+/* The site uses a 3px accent ring at 5px offset for links and buttons. Inputs
+   keep the ring and weight but tighten the offset, because at 5px the ring of
+   one field overlaps the label of the next. */
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-color: #8f9a80;
+}
+.field-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+/* Error state is carried by three signals, not one: the leading warning glyph,
+   the message text itself, and a thicker left edge on the control. Colour is
+   the fourth signal, never the only one. */
+.field-error {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--error);
+}
+.field-error[hidden] {
+  display: none;
+}
+.field-error-mark {
+  font-size: 14px;
+  line-height: 1.45;
+  flex-shrink: 0;
+}
+.field-invalid input:not([type="checkbox"]),
+.field-invalid textarea {
+  border-color: var(--error);
+  border-left-width: 3px;
+  background: #fdf5f2;
+}
+.consent-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.consent-row input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.consent-row label {
+  font-weight: 400;
+  line-height: 1.6;
+}
+.field-consent.field-invalid .consent-row input {
+  outline: 2px solid var(--error);
+  outline-offset: 3px;
+}
+/* Off-screen rather than display:none, and aria-hidden with tabindex="-1" so
+   neither sighted users nor assistive technology ever reach it. Positioned
+   against the form, not the page, so it cannot widen the document. */
+.offscreen-field {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.offscreen-field input {
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+}
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+}
+.contact-form button[type="submit"] {
+  border: 0;
+  gap: 20px;
+}
+.contact-form button[type="submit"][disabled] {
+  cursor: progress;
+  opacity: 0.72;
+  transform: none;
+}
+.contact-footnote {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.contact-footnote a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.contact-footnote a:hover {
+  color: var(--accent);
+}
+.contact-summary {
+  max-width: 620px;
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--error);
+}
+.contact-summary:empty {
+  display: none;
+}
+.contact-status {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  max-width: 620px;
+  margin: 18px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.contact-status:not([data-state]) {
+  display: none;
+}
+.contact-status-mark {
+  flex-shrink: 0;
+}
+.contact-status[data-state="error"] {
+  color: var(--error);
+  font-weight: 500;
+}
+.contact-status[data-state="pending"] {
+  color: #4c5445;
+}
+.contact-status[data-state="success"] {
+  color: #35502a;
+  font-weight: 500;
+}
+.contact-confirmation {
+  max-width: 620px;
+  background: var(--white);
+  border: 1px solid #ccd2c2;
+  border-left: 3px solid #55674c;
+  border-radius: 6px;
+  padding: 26px 28px;
+}
+.contact-confirmation:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+.contact-confirmation h4 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+  margin: 0 0 10px;
+}
+.contact-confirmation p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4c5445;
+  margin: 0;
+}
+.contact-confirmation p + p {
+  margin-top: 12px;
+}
+@media (max-width: 540px) {
+  .contact-block {
+    margin-top: 34px;
+    padding-top: 27px;
+  }
+  .contact-block h3 {
+    font-size: 22px;
+  }
+  .contact-form {
+    padding: 20px 18px;
+    gap: 20px;
+  }
+  .contact-confirmation {
+    padding: 22px 18px;
+  }
+  .contact-actions {
+    gap: 14px 18px;
+  }
+  .contact-form button[type="submit"] {
+    width: 100%;
   }
 }

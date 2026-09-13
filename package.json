@@ -7,7 +7,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "playwright test"
+    "test": "playwright test",
+    "csp:check": "node scripts/check-csp.mjs",
+    "og:image": "node scripts/generate-og-image.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

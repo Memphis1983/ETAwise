@@ -45,8 +45,15 @@ test("early access is honest and legal notices work", async ({ page }) => {
     .click();
   await expect(page.getByText("Registration is not open yet.")).toBeVisible();
   await page.getByRole("button", { name: "Privacy", exact: true }).click();
+  // Was "No signup information is collected". The contact form now submits
+  // name, email, and message, so the notice had to say so and the assertion
+  // moved to the two claims that are still true: no signup, and an accurate
+  // description of what the form does collect.
   await expect(page.getByRole("dialog")).toContainText(
-    "No signup information is collected",
+    "There is no registration or signup form",
+  );
+  await expect(page.getByRole("dialog")).toContainText(
+    "sends the name, email address, and message you type",
   );
   await page.getByRole("button", { name: "Close dialog" }).click();
   await page.getByRole("button", { name: "Terms", exact: true }).click();

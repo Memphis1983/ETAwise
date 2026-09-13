@@ -22,6 +22,27 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+// Marks the navigation link for the section currently in view.
+const navLinks = [...navigation.querySelectorAll('a[href^="#"]')];
+const navSections = navLinks
+  .map((link) => document.querySelector(link.getAttribute("href")))
+  .filter(Boolean);
+if (navSections.length && "IntersectionObserver" in window) {
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.find((entry) => entry.isIntersecting);
+      if (!visible) return;
+      for (const link of navLinks) {
+        if (link.getAttribute("href") === `#${visible.target.id}`)
+          link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      }
+    },
+    { rootMargin: "-45% 0px -45% 0px" },
+  );
+  navSections.forEach((section) => sectionObserver.observe(section));
+}
+
 // All preview records and AI outputs are authored examples, never live inference.
 const examples = {
   attention: {
@@ -110,9 +131,11 @@ const notices = {
   privacy: [
     "Website privacy",
     [
-      "This preview website has no registration form, analytics scripts, advertising trackers, or non-essential cookies. No signup information is collected. Interactive examples run in your browser and use fictional data.",
-      "Your browser requests the website files from its hosting server. The hosting provider may process connection information such as your IP address and request time according to its configuration and policies.",
-      "Do not submit support records or personal information through this preview. A full privacy notice, operator identity, contact details, and retention terms must be published before registration or product data collection begins.",
+      "This preview website has no analytics scripts, advertising trackers, or non-essential cookies. There is no registration or signup form and no account can be created. Interactive examples run in your browser and use fictional data.",
+      "The early-access section has a contact form. Submitting it sends the name, email address, and message you type to Formspree, a third-party form service, which forwards them by email to ETAwise so we can reply. Formspree therefore handles your submission on the way to us, under its own terms and privacy policy. We keep that message, and whatever you choose to put in it, in order to reply.",
+      "The page also publishes the contact address contactus@etawise.tech. That link opens your own email program; nothing is sent or stored by this website when you use it. If you do email us, we receive and keep that message in order to reply.",
+      "Your browser requests the website files from Azure Static Web Apps, a Microsoft hosting service. Microsoft may process connection information such as your IP address and request time according to its configuration and policies.",
+      "Do not send support records, customer details, or other personal information to us through this preview. A full privacy notice, operator identity, and retention terms must be published before registration or product data collection begins.",
     ],
   ],
   terms: [
@@ -120,7 +143,7 @@ const notices = {
     [
       "ETAwise is an in-development software project. This website is an informational product preview, not a live support service. It does not offer troubleshooting, engineer dispatch, subscriptions, or guaranteed resolution times.",
       "Screens, case details, and AI outputs are illustrative. Planned capabilities may change. No native helpdesk integrations or live AI processing are provided by this website.",
-      "Use of the future product will be subject to separate service terms. Operator identity and business contact details will be published before commercial services or registration are offered.",
+      "Use of the future product will be subject to separate service terms. A contact address is published above; full legal operator identity will be published before commercial services or registration are offered.",
     ],
   ],
 };
@@ -144,3 +167,366 @@ dialog.addEventListener("click", (event) => {
     dialog.close();
 });
 document.getElementById("year").textContent = new Date().getFullYear();
+
+// ---------------------------------------------------------------------------
+// Contact form.
+//
+// Progressive enhancement, in this order:
+//   1. The markup carries `required`, `minlength`, `maxlength` and `type` and
+//      no `novalidate`, so a browser with JavaScript switched off still gets
+//      constraint validation and a native POST straight to Formspree.
+//   2. This module turns native validation off and takes over, because the
+//      native bubbles cannot be tied to the field with aria-describedby, are
+//      not announced on our terms, and vanish on the next keystroke.
+//
+// The submission goes to Formspree, whose endpoint is the form's `action`
+// attribute in index.html. Nothing here is a security control, and there is no
+// longer a server of ours behind the form: the rules below are the only
+// validation we control. Formspree runs its own server-side checks and spam
+// filtering on top, but that layer is theirs, we cannot see or configure it
+// from here, and passing these checks does not mean a submission is accepted.
+// ---------------------------------------------------------------------------
+const contactForm = document.querySelector("#contact-form");
+if (contactForm) initContactForm(contactForm);
+
+function initContactForm(form) {
+  const CONTACT_EMAIL = "contactus@etawise.tech";
+  // The endpoint ships with this placeholder in it until someone pastes a real
+  // Formspree form ID into index.html. While it is still there, submitting
+  // would POST to a URL that does not exist, so the guard below stops instead.
+  const ENDPOINT_PLACEHOLDER = "YOUR_FORMSPREE_ID";
+  // Courtesy checks for the person filling the form in, so they get a message
+  // they can act on without a round trip. They are not a guarantee.
+  const NAME_MIN = 2;
+  const NAME_MAX = 80;
+  const MESSAGE_MIN = 10;
+  const MESSAGE_MAX = 2000;
+  const MIN_ELAPSED_MS = 3000;
+  const EMAIL_SHAPE = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
+
+  const loadedAt = Date.now();
+  const summary = document.getElementById("contact-summary");
+  const status = document.getElementById("contact-status");
+  const statusMark = status.querySelector(".contact-status-mark");
+  const statusText = status.querySelector(".contact-status-text");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const submitLabel = submitButton.querySelector(".button-label");
+  const idleLabel = submitLabel.textContent;
+  const honeypot = form.querySelector('[name="_gotcha"]');
+  let submitting = false;
+
+  form.noValidate = true;
+
+  const fields = [
+    {
+      name: "name",
+      hint: null,
+      check(value) {
+        if (!value) return "Enter your name so we know who we are replying to.";
+        if (value.length < NAME_MIN)
+          return `Your name needs at least ${NAME_MIN} characters.`;
+        if (value.length > NAME_MAX)
+          return `Your name has to be ${NAME_MAX} characters or fewer.`;
+        return "";
+      },
+    },
+    {
+      name: "email",
+      hint: "contact-email-hint",
+      check(value) {
+        if (!value) return "Enter your email address so we can reply.";
+        if (!EMAIL_SHAPE.test(value))
+          return "Enter an email address in the form name@example.com.";
+        return "";
+      },
+    },
+    {
+      name: "message",
+      hint: "contact-message-hint",
+      check(value) {
+        if (!value) return "Enter the message you would like to send us.";
+        if (value.length < MESSAGE_MIN)
+          return `Your message needs at least ${MESSAGE_MIN} characters.`;
+        if (value.length > MESSAGE_MAX)
+          return `Your message has to be ${MESSAGE_MAX} characters or fewer. It is currently ${value.length}.`;
+        return "";
+      },
+    },
+    {
+      name: "consent",
+      hint: null,
+      check(checked) {
+        if (!checked)
+          return "Tick the box to confirm we can store your message in order to reply.";
+        return "";
+      },
+    },
+  ];
+
+  for (const field of fields) {
+    field.input = form.querySelector(`[name="${field.name}"]`);
+    field.wrapper = field.input.closest(".field");
+    field.error = document.getElementById(`contact-${field.name}-error`);
+    field.errorText = field.error.querySelector(".field-error-text");
+    field.touched = false;
+
+    const isCheckbox = field.input.type === "checkbox";
+    // Validate on blur, but only once the field has been left or a submit has
+    // been attempted. Nobody wants an error while they are still typing.
+    field.input.addEventListener(isCheckbox ? "change" : "blur", () => {
+      field.touched = true;
+      validateField(field);
+    });
+    // While an error is showing, clear it the moment the value becomes valid.
+    // Never replace one message with another mid-keystroke.
+    field.input.addEventListener("input", () => {
+      if (!field.error.hidden && !field.check(readField(field)))
+        clearFieldError(field);
+    });
+  }
+
+  function readField(field) {
+    return field.input.type === "checkbox"
+      ? field.input.checked
+      : field.input.value.trim();
+  }
+
+  function setDescribedBy(field, withError) {
+    const ids = [];
+    if (field.hint) ids.push(field.hint);
+    if (withError) ids.push(field.error.id);
+    if (ids.length) field.input.setAttribute("aria-describedby", ids.join(" "));
+    else field.input.removeAttribute("aria-describedby");
+  }
+
+  function showFieldError(field, message) {
+    field.errorText.textContent = message;
+    field.error.hidden = false;
+    field.wrapper.classList.add("field-invalid");
+    field.input.setAttribute("aria-invalid", "true");
+    setDescribedBy(field, true);
+  }
+
+  function clearFieldError(field) {
+    field.error.hidden = true;
+    field.errorText.textContent = "";
+    field.wrapper.classList.remove("field-invalid");
+    field.input.removeAttribute("aria-invalid");
+    setDescribedBy(field, false);
+  }
+
+  function validateField(field) {
+    const message = field.check(readField(field));
+    if (message) showFieldError(field, message);
+    else clearFieldError(field);
+    return !message;
+  }
+
+  function setStatus(state, message) {
+    if (!state) {
+      status.removeAttribute("data-state");
+      statusMark.textContent = "";
+      statusText.textContent = "";
+      return;
+    }
+    status.setAttribute("data-state", state);
+    // The glyph is decoration for sighted users; the message carries the
+    // meaning, so the mark stays out of the announcement.
+    statusMark.textContent =
+      state === "error" ? "\u26A0" : state === "success" ? "\u2713" : "";
+    statusText.textContent = message;
+  }
+
+  function setSubmitting(state) {
+    submitting = state;
+    submitButton.disabled = state;
+    submitLabel.textContent = state ? "Sending\u2026" : idleLabel;
+    if (state) form.setAttribute("aria-busy", "true");
+    else form.removeAttribute("aria-busy");
+  }
+
+  function reportInvalid(invalid) {
+    summary.textContent =
+      invalid.length === 1
+        ? "1 field needs attention. It is marked below."
+        : `${invalid.length} fields need attention. They are marked below.`;
+    setStatus(null, "");
+    invalid[0].input.focus();
+  }
+
+  function showConfirmation() {
+    const panel = document.createElement("div");
+    panel.className = "contact-confirmation";
+    panel.tabIndex = -1;
+    const heading = document.createElement("h4");
+    heading.textContent = "Message sent.";
+    const lead = document.createElement("p");
+    lead.textContent =
+      "Thank you. Your message is with the ETAwise team and we will reply by email to the address you gave us.";
+    const note = document.createElement("p");
+    note.textContent =
+      "This was a message, not a signup. You have not been added to any early-access list and no account has been created.";
+    panel.append(heading, lead, note);
+    form.replaceWith(panel);
+    // Focus was on the submit button, which has just been removed, so move it
+    // somewhere deliberate instead of letting it fall back to the document.
+    panel.focus();
+  }
+
+  // Formspree reports a rejection as a JSON `errors` array, each entry carrying
+  // a `message` and, for a field-level problem, the `field` it belongs to. Its
+  // spam filtering arrives the same way. Anything else, including no JSON body
+  // at all, falls through to the generic message: an unreadable rejection is
+  // still a rejection, and the status we already have is the honest thing to
+  // report.
+  async function readErrors(response) {
+    try {
+      const body = await response.json();
+      if (body && Array.isArray(body.errors)) return body.errors;
+    } catch {
+      // Not JSON. Nothing to map onto the fields.
+    }
+    return [];
+  }
+
+  async function handleRejection(response) {
+    if (response.status === 429) {
+      // No wait time is quoted. Formspree owns this limit, does not document a
+      // Retry-After, and a cross-origin response only exposes that header if the
+      // server opts in, so any number here would be invented.
+      setStatus(
+        "error",
+        `Too many messages have been sent from this connection. Try again in a few minutes, or email ${CONTACT_EMAIL} directly.`,
+      );
+      return;
+    }
+    if (response.status >= 500) {
+      setStatus(
+        "error",
+        `The form service returned an error and your message was not sent. Please try again shortly, or email ${CONTACT_EMAIL} directly.`,
+      );
+      return;
+    }
+    if (response.status === 404) {
+      setStatus(
+        "error",
+        `The contact form is not connected correctly, so nothing was sent. Please email ${CONTACT_EMAIL} directly.`,
+      );
+      return;
+    }
+    if (response.status >= 400) {
+      const errors = await readErrors(response);
+      const invalid = [];
+      for (const field of fields) {
+        // The wording on these comes from Formspree, not from us.
+        const entry = errors.find(
+          (item) =>
+            item &&
+            item.field === field.name &&
+            typeof item.message === "string" &&
+            item.message,
+        );
+        if (entry) {
+          showFieldError(field, entry.message);
+          invalid.push(field);
+        }
+      }
+      if (invalid.length) {
+        reportInvalid(invalid);
+        setStatus(
+          "error",
+          "Your message was not sent. Check the fields marked above and send again.",
+        );
+        return;
+      }
+      // No field to point at. Covers Formspree's spam rejection, which is a
+      // deliberate refusal we cannot argue with and must not dress up as
+      // success, as well as anything else it declines.
+      setStatus(
+        "error",
+        `Your message was not accepted, so nothing was sent. Please email ${CONTACT_EMAIL} directly.`,
+      );
+      return;
+    }
+    setStatus(
+      "error",
+      `Your message was not sent (error ${response.status}). Please email ${CONTACT_EMAIL} directly.`,
+    );
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (submitting) return;
+
+    for (const field of fields) field.touched = true;
+    const invalid = fields.filter((field) => !validateField(field));
+    if (invalid.length) {
+      reportInvalid(invalid);
+      return;
+    }
+    summary.textContent = "";
+
+    // The honeypot is cleared here rather than rejected on.
+    //
+    // Rejecting a filled `_gotcha` in this path caught real people: password
+    // managers and browser autofill fill off-screen inputs, ignore
+    // `autocomplete="off"`, and cannot see that a field is positioned away from
+    // the viewport. It also caught nothing, because a script that wanted to
+    // bypass this check would post straight to Formspree without running any of
+    // this JavaScript.
+    //
+    // Leaving a filled value in place would be worse still: Formspree would
+    // discard the submission server-side and this page would report a success
+    // that never happened. Clearing it means an autofilled honeypot cannot lose
+    // a real message either way. The field stays in the markup because the
+    // no-JavaScript path still posts it, and Formspree's own honeypot handling
+    // is what guards that route.
+    honeypot.value = "";
+    if (Date.now() - loadedAt < MIN_ELAPSED_MS) {
+      setStatus(
+        "error",
+        "That was submitted very quickly. Take a moment to check your message, then send it again.",
+      );
+      return;
+    }
+
+    // Read back off the form so the endpoint stays defined in exactly one
+    // place: the `action` attribute in index.html.
+    const endpoint = form.getAttribute("action") || "";
+    if (!endpoint || endpoint.includes(ENDPOINT_PLACEHOLDER)) {
+      // Refuse rather than pretend. Posting to an endpoint that does not exist
+      // would lose the message, and reporting success would lose it silently.
+      setStatus(
+        "error",
+        `This form is not connected yet, so nothing was sent. Please email ${CONTACT_EMAIL} directly and we will reply.`,
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    setStatus("pending", "Sending your message\u2026");
+    try {
+      // FormData, not JSON: Formspree reads an ordinary form encoding, and
+      // Accept: application/json keeps the reply as JSON so the visitor stays
+      // on this page instead of being redirected to Formspree's own thank-you.
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      if (response.ok) {
+        setStatus("success", "Message sent. Thank you for getting in touch.");
+        showConfirmation();
+        return;
+      }
+      await handleRejection(response);
+    } catch {
+      setStatus(
+        "error",
+        `We could not reach the form service, so nothing was sent. Check your connection and try again, or email ${CONTACT_EMAIL} directly.`,
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  });
+}
