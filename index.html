@@ -677,15 +677,13 @@
           </div>
           <p class="contact-summary" id="contact-summary" aria-live="polite"></p>
           <!-- ==========================================================
-          FORMSPREE: replace YOUR_FORMSPREE_ID in the action below with the ID
-          from the Formspree dashboard (Forms > your form > the endpoint URL,
-          which looks like https://formspree.io/f/abcdwxyz). This action
-          attribute is the only place the endpoint is defined; src/main.js
-          reads it back off the form. The ID is public by design — it travels
-          in the page every visitor downloads — so it is safe to commit, and
-          there is no key or environment variable to set anywhere.
-          Until it is swapped in, the form refuses to submit and says so
-          rather than pretending it sent: see the guard in src/main.js.
+          FORMSPREE: this action attribute is the only place the endpoint is
+          defined; src/main.js reads it back off the form. The form ID is public
+          by design — it travels in the page every visitor downloads — so it
+          belongs in the repository, and there is no key or environment variable
+          to set anywhere. The guard in src/main.js still refuses to submit if
+          the ID is ever replaced by a placeholder, rather than posting into a
+          void or reporting a success that never happened.
           ========================================================== -->
           <!-- No `novalidate`: without JavaScript the browser's own constraint
           validation is the safety net, and the native POST straight to
@@ -694,7 +692,7 @@
           <form
             class="contact-form"
             id="contact-form"
-            action="https://formspree.io/f/YOUR_FORMSPREE_ID"
+            action="https://formspree.io/f/maeygdzk"
             method="post"
             aria-labelledby="contact-form-title"
           >

@@ -10,16 +10,57 @@ const MIN_ELAPSED_MS = 3000;
 // action attribute. Nothing else is called.
 const FORMSPREE = "https://formspree.io/f/*";
 
-// index.html ships with the YOUR_FORMSPREE_ID placeholder still in the action,
-// and main.js refuses to submit while it is there. That refusal has its own test
-// below; every other submit test replaces the action with an ID-shaped endpoint
-// first, which is what the site will look like once a real ID is pasted in.
+// The committed action carries the real form ID. Submit tests still repoint it
+// at a throwaway endpoint so that a missed mock can never post to the live form,
+// and the guard test below puts a placeholder back to prove that refusal still
+// works for anyone who copies this file without an ID.
 const CONNECTED_ENDPOINT = "https://formspree.io/f/testtest";
+
+// `html { scroll-behavior: smooth }` means navigating to a fragment leaves the
+// document scrolling for a while afterwards. Every element's viewport position is
+// still moving during that time, so Playwright rightly refuses to click one --
+// "element is not stable". Waiting for scrollY to hold still for two consecutive
+// frames is the honest fix; forcing the click would only hide it. Worse on the
+// mobile viewport, where the form sits further down and the scroll runs longer.
+// Stability check that does not need JavaScript in the page. boundingBox() is
+// driven from the test process over CDP, so it still works when scripting is
+// off. Polls until the box holds still twice in a row, which covers the async
+// web-font swap: when DM Sans and Instrument Serif arrive, text reflows and
+// everything below it shifts. That is load-dependent, which is exactly why it
+// only bit under parallel runs, and document.fonts.ready is unavailable with
+// scripting disabled.
+async function settleBox(locator, timeout = 10000) {
+  const deadline = Date.now() + timeout;
+  let previous = null;
+  while (Date.now() < deadline) {
+    const box = await locator.boundingBox();
+    const key = box && `${box.x},${box.y},${box.width},${box.height}`;
+    if (key && key === previous) return;
+    previous = key;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error("element never stopped moving");
+}
+
+async function settle(page) {
+  await page.waitForFunction(
+    () =>
+      new Promise((resolve) => {
+        let last = window.scrollY;
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => resolve(window.scrollY === last));
+        });
+      }),
+    undefined,
+    { timeout: 10000 },
+  );
+}
 
 async function openForm(page) {
   const openedAt = Date.now();
   await page.goto("/#early-access");
   await expect(page.locator("#contact-form")).toBeVisible();
+  await settle(page);
   return openedAt;
 }
 
@@ -236,11 +277,13 @@ test("an unreplaced form ID refuses to send instead of claiming success", async 
     return route.fulfill({ status: 200, body: '{"ok":true}' });
   });
 
-  // Deliberately not connected: the action is whatever index.html ships with.
-  await expect(page.locator("#contact-form")).toHaveAttribute(
-    "action",
-    "https://formspree.io/f/YOUR_FORMSPREE_ID",
-  );
+  // The committed action has a real ID, so put a placeholder back: the guard has
+  // to keep working for anyone who copies this form without one.
+  await page
+    .locator("#contact-form")
+    .evaluate((form) =>
+      form.setAttribute("action", "https://formspree.io/f/YOUR_FORMSPREE_ID"),
+    );
 
   await fillValidForm(page);
   await waitOutTimingGuard(page, openedAt);
@@ -406,8 +449,24 @@ test("a submit inside the first three seconds is held back", async ({
     return route.fulfill({ status: 200, body: "{}" });
   });
 
-  await fillValidForm(page);
-  await page.getByRole("button", { name: "Send message" }).click();
+  // Filled in a single evaluate rather than four awaited interactions: this test
+  // has to submit inside the 3s window it is asserting on, and typing field by
+  // field under parallel load was slow enough to leave the window before the
+  // click landed. Events are dispatched so the form sees real input.
+  await page.evaluate(() => {
+    const set = (id, value) => {
+      const field = document.getElementById(id);
+      if (field.type === "checkbox") field.checked = value;
+      else field.value = value;
+      field.dispatchEvent(new Event("input", { bubbles: true }));
+      field.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    set("contact-name", "Casey Quinn");
+    set("contact-email", "casey.quinn@example.com");
+    set("contact-message", "Asking how you track update commitments after a handoff.");
+    set("contact-consent", true);
+    document.querySelector("#contact-form button[type=submit]").click();
+  });
 
   await expect(page.locator("#contact-status")).toContainText(
     "submitted very quickly",
@@ -419,6 +478,7 @@ test("the form fits every width it has to fit", async ({ page }) => {
   for (const width of [320, 390, 540, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/#early-access");
+    await settle(page);
     await expect(page.locator("#contact-form")).toBeVisible();
     // A 16px minimum keeps iOS Safari from zooming the viewport on focus.
     for (const selector of ["#contact-name", "#contact-email", "#contact-message"]) {
@@ -438,7 +498,13 @@ test("the form fits every width it has to fit", async ({ page }) => {
 });
 
 test.describe("without JavaScript", () => {
-  test.use({ javaScriptEnabled: false });
+  // reducedMotion because the site's own `prefers-reduced-motion` block sets
+  // `html { scroll-behavior: auto }`. Without it the checkbox sits ~5700px down,
+  // so Playwright has to scroll it into view, smooth scrolling makes that a
+  // glide, and every retry restarts the glide -- the element is never stable and
+  // the click is refused until the test times out. Geometry is otherwise
+  // provably still; this is the scroll, not the hero animation.
+  test.use({ javaScriptEnabled: false, reducedMotion: "reduce" });
 
   test("the form still posts natively to Formspree", async ({ page }) => {
     let posted = null;
@@ -456,7 +522,16 @@ test.describe("without JavaScript", () => {
       });
     });
 
-    await page.goto("/#early-access");
+    // No fragment: `html { scroll-behavior: smooth }` would leave the document
+    // gliding, and every element's viewport box moves while it does, so a click
+    // is refused as unstable. settle() cannot help here because it runs
+    // waitForFunction, which needs the JavaScript this test switches off.
+    // Playwright scrolls the element in itself, through CDP, instantly.
+    // networkidle so the font files are in before anything is clicked; the swap
+    // reflows the page and moves the form. The fragment lands the form in view
+    // instantly under reduced motion, so nothing has to be scrolled to.
+    await page.goto("/#early-access", { waitUntil: "networkidle" });
+    await settleBox(page.locator("#contact-consent"));
     // Native constraint validation is the baseline here: the markup ships
     // without novalidate, so the browser enforces the rules on its own.
     await expect(page.locator("#contact-form")).not.toHaveAttribute(
@@ -471,8 +546,8 @@ test.describe("without JavaScript", () => {
     );
     expect(posted).not.toBeNull();
     // The action attribute is the endpoint with no JavaScript involved, so this
-    // is the URL as committed, placeholder ID and all.
-    expect(posted.url).toBe("https://formspree.io/f/YOUR_FORMSPREE_ID");
+    // is the URL exactly as committed.
+    expect(posted.url).toBe("https://formspree.io/f/maeygdzk");
     expect(posted.method).toBe("POST");
     expect(posted.body).toContain("name=Casey+Quinn");
     expect(posted.body).toContain("consent=yes");

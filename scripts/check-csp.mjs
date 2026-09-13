@@ -106,11 +106,10 @@ await page.route("**/formspree.io/f/*", (route) =>
     body: JSON.stringify({ ok: true }),
   }),
 );
-// The committed action still carries the YOUR_FORMSPREE_ID placeholder, and the
-// guard in main.js refuses to submit while it does. Swapping in an ID-shaped
-// endpoint is what lets the real submit path run, which is the point here: the
-// fetch below is what proves connect-src allows https://formspree.io under this
-// policy. The request itself is answered by the mock above.
+// The submit below is what proves connect-src allows https://formspree.io under
+// this policy. The action is repointed at a throwaway ID so a missed mock cannot
+// reach the live form; the request itself is answered by the mock above, so
+// nothing leaves this machine.
 await page
   .locator("#contact-form")
   .evaluate((form) =>
