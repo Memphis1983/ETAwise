@@ -947,9 +947,107 @@ h1 .serif {
   grid-template-columns: repeat(3, 1fr);
   gap: 38px;
 }
+/* Workflow cards ------------------------------------------------------------
+   These three were hairline-separated columns sitting straight on the paper.
+   They are now cards on a shaded surface, which is a container-and-motion
+   change only: every colour, icon, size and margin inside them is the one it
+   was, with the single exception noted at .steps p below.
+
+   The shade runs light at the top to dark at the bottom, and the original
+   #bec4b3 rule is kept as border-top-color so it is still the strongest line
+   on the card and the section still reads the way it did.
+
+   The hover shade lives on ::before rather than on this element, because a
+   linear-gradient is a background-image and background-image does not
+   interpolate: swapping it on hover would snap. Cross-fading a second gradient
+   on a pseudo-element animates opacity instead, which is compositor-only, so
+   it cannot reflow and cannot shift the page.
+
+   The hover state is *lighter* than rest, not darker, and that is deliberate.
+   Every text colour in here was picked against --paper and a grey card already
+   costs each of them ~0.85 of their ratio; a darker hover would spend the rest
+   of the margin and put .step-tag and .steps p back on the AA boundary. Rest
+   is therefore the worst case for contrast, hover can only improve it, and the
+   "it lifted" signal is carried by the shadow, the border and the transform. */
 .steps article {
-  border-top: 1px solid #bec4b3;
-  padding-top: 23px;
+  position: relative;
+  /* So the z-index: -1 on ::before is trapped here and cannot paint behind the
+     section. position: relative alone does not open a stacking context. */
+  isolation: isolate;
+  border: 1px solid #d7d5c6;
+  border-top-color: #bec4b3;
+  border-radius: 7px;
+  background-color: #eeece4;
+  background-image: linear-gradient(180deg, #eeece4 0%, #e0dfd5 100%);
+  box-shadow:
+    0 1px 2px #333b200a,
+    0 6px 18px #333b200d;
+  padding: 23px 22px 24px;
+  transition:
+    transform 240ms ease-out,
+    box-shadow 240ms ease-out,
+    border-color 240ms ease-out;
+}
+/* Negative z-index paints above the element's own background and below its
+   in-flow content, so this is the hover shade waiting at zero opacity. */
+.steps article::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(180deg, #f2f0e9 0%, #e6e4da 100%);
+  opacity: 0;
+  transition: opacity 240ms ease-out;
+}
+/* Gated on hover: hover so a tap does not leave a phone stuck in the hovered
+   state. Everything above has to look finished without this block, because on
+   a touch device that is the only state there is. */
+@media (hover: hover) {
+  .steps article:hover {
+    transform: translateY(-3px);
+    border-color: #c8c6b5;
+    border-top-color: #aeb59f;
+    box-shadow:
+      0 2px 4px #333b2010,
+      0 14px 30px #333b2014;
+  }
+  .steps article:hover::before {
+    opacity: 1;
+  }
+  .steps article:hover .step-number > span {
+    transform: var(--glyph-shift);
+  }
+}
+/* Not inside the hover: hover query: a keyboard user on a touch screen still
+   needs the affordance. Nothing in these cards is focusable today, so this
+   cannot fire yet; it is here so a link added later is covered by default. */
+.steps article:focus-within {
+  transform: translateY(-3px);
+  border-color: #c8c6b5;
+  border-top-color: #aeb59f;
+  box-shadow:
+    0 2px 4px #333b2010,
+    0 14px 30px #333b2014;
+}
+.steps article:focus-within::before {
+  opacity: 1;
+}
+.steps article:focus-within .step-number > span {
+  transform: var(--glyph-shift);
+}
+/* Second and last gesture: the accent glyph travels the way it points. Carried
+   on a custom property, the same way .section-icon carries --icon-accent, so
+   the three directions are declarations and there is a single hover rule to
+   turn off for reduced motion. The spark has no direction, so it grows. */
+.steps article:nth-child(1) {
+  --glyph-shift: translate(2px, -2px);
+}
+.steps article:nth-child(2) {
+  --glyph-shift: scale(1.14);
+}
+.steps article:nth-child(3) {
+  --glyph-shift: translateX(3px);
 }
 .step-number {
   display: flex;
@@ -964,6 +1062,10 @@ h1 .serif {
 .step-number > span {
   font-size: 23px;
   color: var(--accent);
+  /* A flex item is blockified, so transform applies here without setting
+     display: inline-block. Kept on transform only: the glyph must not change
+     the row's height or the number beside it would move too. */
+  transition: transform 240ms ease-out;
 }
 .steps h3 {
   font-size: 20px;
@@ -973,7 +1075,11 @@ h1 .serif {
 }
 .steps p {
   font-size: 14px;
-  color: var(--muted);
+  /* Not --muted. #686a60 is 4.96:1 on --paper but only 4.11:1 on the dark end
+     of the card shade, which fails AA for 14px. #5d5f55 is the same hue two
+     steps down and clears it at 4.85:1 there, 5.79:1 on the light end. It is
+     the only colour in this section the card forced a change to. */
+  color: #5d5f55;
   margin-bottom: 28px;
 }
 .step-tag {
@@ -1508,6 +1614,13 @@ dialog p:last-child {
   .steps {
     gap: 20px;
   }
+  /* Still three columns down to 541px, so this is where the card padding is
+     paid for out of the narrowest content width the layout ever has: 206.7px
+     of column at a 700px viewport. 16px a side keeps ~174px of text, which is
+     wider than the longest word in the section at 13px. */
+  .steps article {
+    padding: 20px 16px 22px;
+  }
   .steps h3 {
     font-size: 17px;
   }
@@ -1840,6 +1953,11 @@ dialog p:last-child {
     grid-template-columns: 1fr;
     gap: 30px;
   }
+  /* One column, so the width is back and the padding can return to its
+     full-size value. */
+  .steps article {
+    padding: 22px 20px 24px;
+  }
   .step-number {
     font-size: 29px;
     margin-bottom: 14px;
@@ -1984,6 +2102,24 @@ dialog p:last-child {
     scale: 1;
   }
   .action-slip:hover {
+    transform: none;
+  }
+  /* Workflow cards, same rule as above: named as well as caught by the
+     wildcard, and both gestures give up their movement. The shade cross-fade,
+     the shadow and the border still change, so the card is still visibly
+     responding; it just no longer travels. */
+  .steps article,
+  .steps article::before,
+  .step-number > span {
+    transition: none;
+    animation: none;
+  }
+  .steps article:hover,
+  .steps article:focus-within {
+    transform: none;
+  }
+  .steps article:hover .step-number > span,
+  .steps article:focus-within .step-number > span {
     transform: none;
   }
 }
