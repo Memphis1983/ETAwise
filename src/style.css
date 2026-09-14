@@ -1173,15 +1173,141 @@ h1 .serif {
   font-size: 11px;
   color: #c1c7b8;
 }
+/* Principle cards ----------------------------------------------------------
+   The same container-and-motion change as the workflow cards above, on the
+   same vocabulary: 7px radius, 240ms ease-out, a -3px lift, the hover shade
+   cross-faded on a ::before at zero opacity because a linear-gradient is a
+   background-image and does not interpolate, and nothing animated but
+   transform, opacity, box-shadow and border-color. Every colour, icon, size
+   and margin inside the card is the one it was; the only additions are the
+   card's own border, radius, background and side padding.
+
+   Three things invert here, because the section is dark:
+
+   1. Elevation reads lighter, not darker. A raised surface on #282d25 is a
+      lighter surface, so the shade sits *above* the section rather than below
+      it the way the workflow card sits below --paper. The gradient still runs
+      light at the top to dark at the bottom, so the light is still coming from
+      above; it is only the step relative to the section that flips.
+
+   2. The shadow is no longer the lift signal. Black on #282d25 is very nearly
+      invisible, so the elevation is carried by the background step and by the
+      border, and the shadow is kept to a narrow contact shade that only reads
+      because the card above it is lighter than the section. It supports the
+      other two rather than doing the work.
+
+   3. Hover is *lighter* than rest, which is the same direction the workflow
+      card takes but for the opposite reason. There, rest was the contrast
+      worst case and a lighter hover could only improve it. Here lightening
+      costs contrast, so hover is the worst case — and it is still affordable,
+      because light-on-dark leaves this section far more headroom than the
+      workflow card had: the dimmest ink in the card, the #b8c4a5 marker, is
+      6.11:1 at the very lightest point of the hover shade against a 4.5
+      requirement. The one value that is genuinely close to a floor is the
+      decorative --orange in the icons, 4.27:1 on the bare section against the
+      3:1 non-text minimum, and the hover shade is capped at +15 for it: it
+      holds 3.39:1 at the lightest point the icon can sit on. That cap is the
+      reason the shade steps this far and no further. */
 .ai-principles article {
   display: flex;
   gap: 20px;
-  border-top: 1px solid #505747;
-  padding-top: 25px;
+  position: relative;
+  /* So the z-index: -1 on ::before is trapped here and cannot paint behind the
+     section. position: relative alone does not open a stacking context. */
+  isolation: isolate;
+  /* The original 1px #505747 rule is kept as border-top-color, so it is still
+     the brightest line on the card and the rail still reads the way it did. */
+  border: 1px solid #3f4739;
+  border-top-color: #505747;
+  border-radius: 7px;
+  background-color: #31372e;
+  background-image: linear-gradient(180deg, #31372e 0%, #2c322a 100%);
+  box-shadow:
+    0 1px 2px #0e120b40,
+    0 6px 16px #0e120b33;
+  /* padding-top was already 25px, under the rule. Kept, so the marker and the
+     icon sit exactly where they sat; the sides and the bottom are new. */
+  padding: 25px 22px 24px;
   margin-bottom: 26px;
+  transition:
+    transform 240ms ease-out,
+    box-shadow 240ms ease-out,
+    border-color 240ms ease-out;
+}
+/* Negative z-index paints above the element's own background and below its
+   in-flow content, so this is the hover shade waiting at zero opacity. An
+   absolutely positioned ::before is out of flow, so it is not a flex item of
+   the article and cannot affect the two columns inside it. */
+.ai-principles article::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(180deg, #373d33 0%, #31372e 100%);
+  opacity: 0;
+  transition: opacity 240ms ease-out;
 }
 .ai-principles article:last-child {
   margin-bottom: 0;
+}
+/* Gated on hover: hover so a tap does not leave a phone stuck in the hovered
+   state. Everything above has to look finished without this block, because on
+   a touch device that is the only state there is. */
+@media (hover: hover) {
+  .ai-principles article:hover {
+    transform: translateY(-3px);
+    /* Brighter, not darker. On the light card hover pushed the border down to
+       make it more present; the equivalent move on a dark card is up. */
+    border-color: #4c5445;
+    border-top-color: #626b57;
+    box-shadow:
+      0 2px 4px #0e120b4d,
+      0 14px 28px #0e120b40;
+  }
+  .ai-principles article:hover::before {
+    opacity: 1;
+  }
+  .ai-principles article:hover .section-icon {
+    transform: var(--glyph-shift);
+  }
+}
+/* Not inside the hover: hover query: a keyboard user on a touch screen still
+   needs the affordance. Nothing in these cards is focusable today, so this
+   cannot fire yet; it is here so a link added later is covered by default. */
+.ai-principles article:focus-within {
+  transform: translateY(-3px);
+  border-color: #4c5445;
+  border-top-color: #626b57;
+  box-shadow:
+    0 2px 4px #0e120b4d,
+    0 14px 28px #0e120b40;
+}
+.ai-principles article:focus-within::before {
+  opacity: 1;
+}
+.ai-principles article:focus-within .section-icon {
+  transform: var(--glyph-shift);
+}
+/* Second and last gesture, the same one the workflow cards use: the mark that
+   carries the accent moves the way it points. Here that mark is the icon
+   itself, since the accent lives inside it rather than beside it. Carried on
+   the same --glyph-shift custom property, so the three directions are
+   declarations at (0,2,1) and there is a single hover rule for reduced motion
+   to turn off — an :nth-child(n):hover rule would reach (0,4,2) and out-specify
+   that override. The two sets never nest, so the shared property name cannot
+   collide. */
+.ai-principles article:nth-child(1) {
+  /* The return arrow points up at its source line. */
+  --glyph-shift: translateY(-2px);
+}
+.ai-principles article:nth-child(2) {
+  /* Two parallel rules point nowhere, so this one grows instead. */
+  --glyph-shift: scale(1.1);
+}
+.ai-principles article:nth-child(3) {
+  /* The check leaves up and to the right. */
+  --glyph-shift: translate(2px, -2px);
 }
 .ai-principles article > span {
   color: #b8c4a5;
@@ -1199,6 +1325,10 @@ h1 .serif {
   --icon-accent: var(--orange);
   color: #c6cebb;
   margin-bottom: 14px;
+  /* Kept on transform only: the icon must not change the text column's height
+     or the h3 and the paragraph under it would move as well. Scoped to
+     .ai-principles so the six-icon set in #how-it-works is untouched. */
+  transition: transform 240ms ease-out;
 }
 .ai-principles h3 {
   font-size: 17px;
@@ -2120,6 +2250,23 @@ dialog p:last-child {
   }
   .steps article:hover .step-number > span,
   .steps article:focus-within .step-number > span {
+    transform: none;
+  }
+  /* Principle cards, same treatment. The shade cross-fade, the shadow and the
+     border still change, so the card is still visibly responding; it just no
+     longer travels and the icon no longer moves. */
+  .ai-principles article,
+  .ai-principles article::before,
+  .ai-principles .section-icon {
+    transition: none;
+    animation: none;
+  }
+  .ai-principles article:hover,
+  .ai-principles article:focus-within {
+    transform: none;
+  }
+  .ai-principles article:hover .section-icon,
+  .ai-principles article:focus-within .section-icon {
     transform: none;
   }
 }
