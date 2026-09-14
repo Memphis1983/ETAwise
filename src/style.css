@@ -2097,18 +2097,51 @@ dialog p:last-child {
 }
 
 /* ---------------------------------------------------------------------------
-   Contact form. Lives inside the early-access panel (#e8eadd), so the form
-   itself sits on a --white card the way .workspace does, and every colour is
-   checked against that card rather than the page paper.
+   Contact form. Lives inside the early-access panel (#e8eadd). The form sits on
+   a --white surface the way .workspace does, and every colour in it is checked
+   against that surface rather than the page paper -- which is why the modal
+   below is --white too, and not the --paper the information dialog uses. Moving
+   the form onto paper would invalidate the contrast work on the hints, errors,
+   and placeholders.
+
+   The section is a two-column rail: heading and lede on the left, the early
+   access note on the right. .contact-block continues that rail with the same
+   template, so the intro copy lands under the heading column and the call to
+   action lands under the note column instead of leaving it empty.
    --------------------------------------------------------------------------- */
 .contact-block {
   border-top: 1px solid #c5cdb8;
-  margin-top: 44px;
-  padding-top: 34px;
+  margin-top: 38px;
+  padding-top: 30px;
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 26px 70px;
+  align-items: start;
 }
 .contact-intro {
   max-width: 620px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+}
+.contact-launch {
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+  /* .access-note insets its content by 37px to clear its divider rule. Matching
+     it here is what puts this button on the same vertical rail as the Email us
+     button directly above it. */
+  padding-left: 37px;
+}
+/* Hidden until src/main.js sets data-contact-enhanced, because showModal() is
+   the only thing this button does. Without JavaScript the dialog below is
+   sitting in the flow with the form in it, so there is nothing to open. */
+.contact-launch-action {
+  display: none;
+}
+[data-contact-enhanced] .contact-launch-action {
+  display: block;
+}
+.contact-launch .button {
+  gap: 0;
 }
 .contact-kicker {
   display: flex;
@@ -2129,6 +2162,92 @@ dialog p:last-child {
   line-height: 1.7;
   color: #4c5445;
   margin: 0;
+}
+/* ---------------------------------------------------------------------------
+   The form's dialog, in two states.
+
+   1. In flow. This is what the markup ships (`<dialog open>`) and the only
+      state a visitor without JavaScript ever sees, so it has to read as the
+      form card it replaces. The UA stylesheet fights this: `dialog` is
+      `position: absolute` with `inset-inline: 0`, `margin: auto`,
+      `border: solid`, `padding: 1em`, `width: fit-content` and
+      `overflow: auto`. Every one of those is undone here. The `position` is the
+      one that matters most -- left alone, the form is lifted out of the flow and
+      lands on top of the footer.
+   2. Modal, after src/main.js has removed `open`. From that point an `open`
+      attribute can only have come from showModal(), so [data-contact-enhanced]
+      is enough to tell the two apart and nothing depends on `:modal` being
+      supported. Author rules beat the UA sheet regardless of specificity, so
+      `position` and `inset` have to be restored explicitly here; the UA's own
+      `dialog:modal` rules cannot win against the `position: static` above.
+   --------------------------------------------------------------------------- */
+.contact-dialog[open] {
+  grid-column: 1 / -1;
+  position: static;
+  display: block;
+  width: 100%;
+  max-width: 620px;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  overflow: visible;
+  box-shadow: none;
+}
+/* No close button and no dialog heading in flow: there is nothing to close, and
+   the section already carries this heading a few lines above. */
+.contact-dialog .dialog-top,
+.contact-dialog > h2 {
+  display: none;
+}
+[data-contact-enhanced] .contact-dialog[open] {
+  grid-column: auto;
+  position: fixed;
+  inset: 0;
+  width: min(570px, calc(100% - 32px));
+  max-width: none;
+  height: fit-content;
+  max-height: min(85vh, calc(100% - 32px));
+  margin: auto;
+  padding: 28px 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 0 30px 100px #0003;
+  /* Scrolls itself rather than locking the document. Locking would mean
+     `overflow: hidden` on the root, which removes the desktop scrollbar and
+     shifts the whole page sideways by its width. `contain` stops the scroll
+     chaining onto the page once the form's own scroll runs out. */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+[data-contact-enhanced] .contact-dialog .dialog-top {
+  display: flex;
+  margin-bottom: 16px;
+}
+[data-contact-enhanced] .contact-dialog > h2 {
+  display: block;
+}
+/* 34px is the information dialog's heading size. Too loud above a form, and it
+   costs a line of height in the modal on a phone. */
+.contact-dialog h2 {
+  font-size: 25px;
+  letter-spacing: -0.7px;
+  font-weight: 500;
+  margin: 0 0 18px;
+}
+/* The modal surface is already the --white the form card provided, so the card
+   would only nest one panel inside another. */
+[data-contact-enhanced] .contact-dialog[open] .contact-form {
+  max-width: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
 }
 .contact-form {
   position: relative;
@@ -2340,6 +2459,28 @@ dialog p:last-child {
 .contact-confirmation p + p {
   margin-top: 12px;
 }
+/* These have to live after the base .contact-block rule above rather than
+   alongside the .access-grid breakpoints further up the file. Media queries add
+   no specificity, so a rule up there loses to a plain class selector down here.
+   The column gap tracks .access-grid's, because the two share a rail. */
+@media (max-width: 1100px) {
+  .contact-block {
+    column-gap: 35px;
+  }
+  .contact-launch {
+    padding-left: 20px;
+  }
+}
+@media (max-width: 800px) {
+  .contact-block {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  /* One column now, so there is no rail left to line up with. */
+  .contact-launch {
+    padding-left: 0;
+  }
+}
 @media (max-width: 540px) {
   .contact-block {
     margin-top: 34px;
@@ -2360,5 +2501,25 @@ dialog p:last-child {
   }
   .contact-form button[type="submit"] {
     width: 100%;
+  }
+  .contact-launch .button {
+    width: 100%;
+    justify-content: center;
+  }
+  /* The generic `dialog` rule drops to 23px here, but this one is a
+     [data-contact-enhanced] selector and would otherwise keep the desktop
+     padding. 20/18 matches the form card it stands in for. */
+  [data-contact-enhanced] .contact-dialog[open] {
+    padding: 20px 18px;
+    /* 16px of breathing room each side at 320px, where `calc(100% - 32px)`
+       leaves the dialog 288px wide. */
+    width: calc(100% - 32px);
+    max-height: min(88vh, calc(100% - 24px));
+  }
+  [data-contact-enhanced] .contact-dialog[open] .contact-form {
+    gap: 20px;
+  }
+  .contact-dialog h2 {
+    font-size: 22px;
   }
 }
