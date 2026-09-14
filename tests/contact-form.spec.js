@@ -1,9 +1,12 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-// The form refuses anything submitted within 3 seconds of load. Tests that
-// expect a submit to go out have to sit out that window rather than mock around
-// it, because the guard is one of the things being tested.
+// The form refuses anything submitted within 3 seconds of the modal opening.
+// That used to be measured from page load; behind a button it never could be,
+// because opening the modal and typing a message always takes longer than that,
+// so the guard would have been unreachable. Tests that expect a submit to go out
+// have to sit out the window rather than mock around it, because the guard is one
+// of the things being tested.
 const MIN_ELAPSED_MS = 3000;
 
 // Every request pattern below is Formspree's endpoint, which is the form's
@@ -16,12 +19,13 @@ const FORMSPREE = "https://formspree.io/f/*";
 // works for anyone who copies this file without an ID.
 const CONNECTED_ENDPOINT = "https://formspree.io/f/testtest";
 
+const TRIGGER = "Open the contact form";
+
 // `html { scroll-behavior: smooth }` means navigating to a fragment leaves the
 // document scrolling for a while afterwards. Every element's viewport position is
 // still moving during that time, so Playwright rightly refuses to click one --
 // "element is not stable". Waiting for scrollY to hold still for two consecutive
-// frames is the honest fix; forcing the click would only hide it. Worse on the
-// mobile viewport, where the form sits further down and the scroll runs longer.
+// frames is the honest fix; forcing the click would only hide it.
 // Stability check that does not need JavaScript in the page. boundingBox() is
 // driven from the test process over CDP, so it still works when scripting is
 // off. Polls until the box holds still twice in a row, which covers the async
@@ -56,11 +60,18 @@ async function settle(page) {
   );
 }
 
+// The form is behind a modal now, so every test that touches a field has to open
+// it first. Returns the moment the modal opened, which is what the 3-second floor
+// is measured from.
 async function openForm(page) {
-  const openedAt = Date.now();
   await page.goto("/#early-access");
-  await expect(page.locator("#contact-form")).toBeVisible();
   await settle(page);
+  const trigger = page.getByRole("button", { name: TRIGGER });
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  const openedAt = Date.now();
+  await expect(page.locator("#contact-dialog")).toBeVisible();
+  await expect(page.locator("#contact-form")).toBeVisible();
   return openedAt;
 }
 
@@ -88,6 +99,31 @@ async function waitOutTimingGuard(page, openedAt) {
   if (remaining > 0) await page.waitForTimeout(remaining);
 }
 
+// There is no backdrop element to click, so a backdrop click is a click on the
+// dialog element at a point outside its own box. Aims at whichever margin around
+// the dialog is roomiest, because the dialog is nearly full-height on a phone and
+// nearly full-width is possible at 320px.
+async function clickBackdrop(page, selector) {
+  const box = await page.locator(selector).boundingBox();
+  const viewport = page.viewportSize();
+  const margins = [
+    { space: box.x, x: box.x / 2, y: box.y + box.height / 2 },
+    {
+      space: viewport.width - (box.x + box.width),
+      x: (box.x + box.width + viewport.width) / 2,
+      y: box.y + box.height / 2,
+    },
+    { space: box.y, x: box.x + box.width / 2, y: box.y / 2 },
+    {
+      space: viewport.height - (box.y + box.height),
+      x: box.x + box.width / 2,
+      y: (box.y + box.height + viewport.height) / 2,
+    },
+  ].sort((a, b) => b.space - a.space);
+  expect(margins[0].space, "no backdrop was reachable").toBeGreaterThan(4);
+  await page.mouse.click(margins[0].x, margins[0].y);
+}
+
 function mockEndpoint(page, status, body) {
   return page.route(FORMSPREE, (route) =>
     route.fulfill({
@@ -98,6 +134,140 @@ function mockEndpoint(page, status, body) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// The modal itself.
+// ---------------------------------------------------------------------------
+test("the section offers a button, not a form, and the form is not in the flow", async ({
+  page,
+}) => {
+  await page.goto("/#early-access");
+  await settle(page);
+
+  // The honesty copy the section has to keep carrying, whether or not the modal
+  // is ever opened.
+  await expect(page.getByText("Registration is not open yet.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Send us a message.", level: 3 }),
+  ).toBeVisible();
+  await expect(page.locator(".contact-lede")).toContainText(
+    "This is a contact form, not a signup",
+  );
+  // The mail-client route stays on the page rather than being buried in the modal.
+  await expect(
+    page.locator(".contact-launch").getByRole("link", {
+      name: "contactus@etawise.tech",
+    }),
+  ).toBeVisible();
+
+  await expect(page.locator("#contact-dialog")).toBeHidden();
+  await expect(page.locator("#contact-form")).toBeHidden();
+  // src/main.js has taken the `open` attribute off, so from here on `open` can
+  // only mean showModal(). The CSS depends on that.
+  await expect(page.locator("#contact-dialog")).not.toHaveAttribute("open", "");
+  const trigger = page.getByRole("button", { name: TRIGGER });
+  await expect(trigger).toBeVisible();
+  await expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
+});
+
+test("the button opens the modal and focus lands inside it", async ({ page }) => {
+  await openForm(page);
+
+  const dialog = page.locator("#contact-dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute("aria-labelledby", "contact-dialog-title");
+  // Named by a heading that is actually on screen, not by hidden text.
+  await expect(page.locator("#contact-dialog-title")).toBeVisible();
+  await expect(page.locator("#contact-dialog-title")).toHaveText(
+    "Send us a message.",
+  );
+
+  const focusedInside = await page.evaluate(() =>
+    document.querySelector("#contact-dialog").contains(document.activeElement),
+  );
+  expect(focusedInside).toBe(true);
+  await expect(page.locator("#contact-dialog-title")).toBeFocused();
+});
+
+test("Escape closes the modal and hands focus back to the trigger", async ({
+  page,
+}) => {
+  await openForm(page);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#contact-dialog")).toBeHidden();
+  await expect(page.getByRole("button", { name: TRIGGER })).toBeFocused();
+});
+
+test("the close button closes the modal and hands focus back to the trigger", async ({
+  page,
+}) => {
+  await openForm(page);
+  await page.getByRole("button", { name: "Close contact form" }).click();
+  await expect(page.locator("#contact-dialog")).toBeHidden();
+  await expect(page.getByRole("button", { name: TRIGGER })).toBeFocused();
+});
+
+test("a click on the backdrop closes the modal, a click inside does not", async ({
+  page,
+}) => {
+  await openForm(page);
+
+  // Inside first: a click on the dialog's own padding must not close it, which is
+  // the whole reason the handler measures the box instead of trusting the target.
+  await page.locator("#contact-dialog-title").click();
+  await expect(page.locator("#contact-dialog")).toBeVisible();
+
+  await clickBackdrop(page, "#contact-dialog");
+  await expect(page.locator("#contact-dialog")).toBeHidden();
+  await expect(page.getByRole("button", { name: TRIGGER })).toBeFocused();
+});
+
+test("the modal can be reopened after being closed", async ({ page }) => {
+  await openForm(page);
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#contact-dialog")).toBeHidden();
+  await page.getByRole("button", { name: TRIGGER }).click();
+  await expect(page.locator("#contact-dialog")).toBeVisible();
+  await expect(page.locator("#contact-form")).toBeVisible();
+});
+
+test("the legal notices still work on their own dialog", async ({ page }) => {
+  await page.goto("/");
+
+  // Both dialogs are in the document now. The notice one has to still be the one
+  // the footer buttons reach.
+  await page.getByRole("button", { name: "Privacy", exact: true }).click();
+  await expect(page.locator("#notice-dialog")).toBeVisible();
+  await expect(page.locator("#contact-dialog")).toBeHidden();
+  await expect(page.locator("#notice-dialog")).toContainText(
+    "There is no registration or signup form",
+  );
+  await page.getByRole("button", { name: "Close dialog" }).click();
+  await expect(page.locator("#notice-dialog")).toBeHidden();
+
+  await page.getByRole("button", { name: "Terms", exact: true }).click();
+  await expect(page.locator("#notice-dialog")).toContainText(
+    "not a live support service",
+  );
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#notice-dialog")).toBeHidden();
+
+  // And the contact modal is independent of it: opening one leaves the other shut.
+  await page.goto("/#early-access");
+  await settle(page);
+  await page.getByRole("button", { name: TRIGGER }).click();
+  await expect(page.locator("#contact-dialog")).toBeVisible();
+  await expect(page.locator("#notice-dialog")).toBeHidden();
+  // Never two at once. showModal() makes the rest of the document inert, so the
+  // footer buttons cannot even be reached from here.
+  const openDialogs = await page.evaluate(
+    () => document.querySelectorAll("dialog[open]").length,
+  );
+  expect(openDialogs).toBe(1);
+});
+
+// ---------------------------------------------------------------------------
+// Validation, unchanged behaviour reached through the modal.
+// ---------------------------------------------------------------------------
 test("an empty submit reports every problem and moves focus to the first one", async ({
   page,
 }) => {
@@ -134,6 +304,8 @@ test("an empty submit reports every problem and moves focus to the first one", a
     "contact-message-hint contact-message-error",
   );
   await expect(page.locator("#contact-name")).toBeFocused();
+  // Errors do not knock the visitor out of the modal.
+  await expect(page.locator("#contact-dialog")).toBeVisible();
 });
 
 test("form errors are announced without colour and stay accessible", async ({
@@ -155,8 +327,6 @@ test("form errors are announced without colour and stay accessible", async ({
     "aria-live",
     "polite",
   );
-
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
 test("an invalid email address is rejected and clears once corrected", async ({
@@ -210,7 +380,7 @@ test("an unticked consent box blocks the submit", async ({ page }) => {
   expect(requests).toBe(0);
 });
 
-test("a valid submit posts a form body to Formspree and confirms on the page", async ({
+test("a valid submit posts a form body to Formspree and confirms in the section", async ({
   page,
 }) => {
   const openedAt = await openForm(page);
@@ -235,19 +405,24 @@ test("a valid submit posts a form body to Formspree and confirms on the page", a
   await waitOutTimingGuard(page, openedAt);
   await page.getByRole("button", { name: "Send message" }).click();
 
-  await expect(page.locator(".contact-confirmation")).toBeVisible();
-  await expect(page.locator(".contact-confirmation")).toContainText(
-    "Message sent.",
-  );
-  await expect(page.locator(".contact-confirmation")).toContainText(
-    "not a signup",
-  );
+  // The confirmation lands in the section, not in the modal, so pressing Escape
+  // on a finished modal cannot take the outcome away with it.
+  const confirmation = page.locator(".contact-confirmation");
+  await expect(confirmation).toBeVisible();
+  await expect(confirmation).toContainText("Message sent.");
+  await expect(confirmation).toContainText("not a signup");
+  await expect(page.locator("#contact-dialog")).toBeHidden();
   await expect(page.locator("#contact-form")).toHaveCount(0);
+  // The trigger has done its job and no longer has one.
+  await expect(page.getByRole("button", { name: TRIGGER })).toHaveCount(0);
   await expect(page.locator("#contact-status")).toHaveAttribute(
     "data-state",
     "success",
   );
-  await expect(page.locator(".contact-confirmation")).toBeFocused();
+  // Focus follows the outcome rather than falling back to the document.
+  await expect(confirmation).toBeFocused();
+  // And it survives a reload of the viewport, i.e. it is really in the page.
+  await expect(confirmation).toBeInViewport();
 
   expect(posted).toHaveLength(1);
   expect(posted[0].url).toBe(CONNECTED_ENDPOINT);
@@ -295,7 +470,10 @@ test("an unreplaced form ID refuses to send instead of claiming success", async 
   await expect(status).toContainText("nothing was sent");
   await expect(status).toContainText("contactus@etawise.tech");
   await expect(page.locator(".contact-confirmation")).toHaveCount(0);
+  // Refusals keep the modal up, with the message still in it.
+  await expect(page.locator("#contact-dialog")).toBeVisible();
   await expect(page.locator("#contact-form")).toBeVisible();
+  await expect(page.locator("#contact-message")).toHaveValue(/tier 2 handoffs/);
   await expect(page.getByRole("button", { name: "Send message" })).toBeEnabled();
   expect(requests).toBe(0);
 });
@@ -320,16 +498,29 @@ test("a rate-limited submit explains the wait and offers the email address", asy
   await expect(status).toContainText("Try again in a few minutes");
   await expect(status).toContainText("contactus@etawise.tech");
   // The form is still there to retry with, and re-enabled.
+  await expect(page.locator("#contact-dialog")).toBeVisible();
   await expect(page.locator("#contact-form")).toBeVisible();
   await expect(page.getByRole("button", { name: "Send message" })).toBeEnabled();
 });
 
-test("a service error and a dead network read differently", async ({ page }) => {
+test("a missing endpoint, a service error, and a dead network read differently", async ({
+  page,
+}) => {
   const openedAt = await openForm(page);
   await connectForm(page);
-  await mockEndpoint(page, 500, { errors: [{ message: "Server error" }] });
+  await mockEndpoint(page, 404, { errors: [{ message: "Not found" }] });
   await fillValidForm(page);
   await waitOutTimingGuard(page, openedAt);
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.locator("#contact-status")).toContainText(
+    "not connected correctly",
+  );
+  await expect(page.locator("#contact-status")).toContainText(
+    "contactus@etawise.tech",
+  );
+
+  await page.unroute(FORMSPREE);
+  await mockEndpoint(page, 500, { errors: [{ message: "Server error" }] });
   await page.getByRole("button", { name: "Send message" }).click();
   await expect(page.locator("#contact-status")).toContainText(
     "The form service returned an error",
@@ -347,6 +538,7 @@ test("a service error and a dead network read differently", async ({ page }) => 
   await expect(page.locator("#contact-status")).toContainText(
     "contactus@etawise.tech",
   );
+  await expect(page.locator(".contact-confirmation")).toHaveCount(0);
 });
 
 test("field-level errors returned by Formspree are shown on the fields", async ({
@@ -373,6 +565,7 @@ test("field-level errors returned by Formspree are shown on the fields", async (
   await expect(page.locator("#contact-status")).toContainText(
     "Check the fields marked above",
   );
+  await expect(page.locator("#contact-dialog")).toBeVisible();
 });
 
 test("a spam rejection with no field to point at is reported, not dressed up", async ({
@@ -432,6 +625,17 @@ test("an autofilled honeypot is cleared instead of losing the message", async ({
   expect(
     await honeypot.evaluate((node) => getComputedStyle(node).display),
   ).not.toBe("none");
+  // The dialog scrolls itself, which makes it a scroll container on both axes.
+  // A field parked 9999px to the left must not turn that into a sideways scroll.
+  const dialogScroll = await page
+    .locator("#contact-dialog")
+    .evaluate((node) => ({
+      scrollWidth: node.scrollWidth,
+      clientWidth: node.clientWidth,
+    }));
+  expect(dialogScroll.scrollWidth).toBeLessThanOrEqual(
+    dialogScroll.clientWidth,
+  );
 
   await fillValidForm(page);
   // What a password manager does: fills the off-screen input it cannot tell is a
@@ -452,10 +656,10 @@ test("an autofilled honeypot is cleared instead of losing the message", async ({
   );
 });
 
-test("a submit inside the first three seconds is held back", async ({
+test("a submit inside three seconds of the modal opening is held back", async ({
   page,
 }) => {
-  await openForm(page);
+  const openedAt = await openForm(page);
   await connectForm(page);
   let requests = 0;
   await page.route(FORMSPREE, (route) => {
@@ -486,41 +690,133 @@ test("a submit inside the first three seconds is held back", async ({
     "submitted very quickly",
   );
   expect(requests).toBe(0);
+  // Nothing is lost: the message is still there and one more click sends it, once
+  // the window it was refused inside has passed.
+  await expect(page.locator("#contact-message")).toHaveValue(
+    /update commitments/,
+  );
+  await waitOutTimingGuard(page, openedAt);
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.locator(".contact-confirmation")).toBeVisible();
+  expect(requests).toBe(1);
 });
 
-test("the form fits every width it has to fit", async ({ page }) => {
-  for (const width of [320, 390, 540, 768, 1024, 1440]) {
+// ---------------------------------------------------------------------------
+// Layout.
+// ---------------------------------------------------------------------------
+test("nothing overflows sideways at any width, modal shut or open", async ({
+  page,
+}) => {
+  for (const width of [320, 390, 540, 700, 800, 920, 1024, 1280, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/#early-access");
     await settle(page);
-    await expect(page.locator("#contact-form")).toBeVisible();
-    // A 16px minimum keeps iOS Safari from zooming the viewport on focus.
-    for (const selector of ["#contact-name", "#contact-email", "#contact-message"]) {
-      const size = await page.locator(selector).evaluate((node) =>
-        parseFloat(getComputedStyle(node).fontSize),
-      );
-      expect(size, `${selector} at ${width}px`).toBeGreaterThanOrEqual(16);
-    }
-    const overflow = await page.evaluate(() => ({
+
+    const shut = await page.evaluate(() => ({
       document: document.documentElement.scrollWidth,
       viewport: window.innerWidth,
     }));
-    expect(overflow.document, `document overflow at ${width}px`).toBeLessThanOrEqual(
-      overflow.viewport,
+    expect(shut.document, `overflow with the modal shut at ${width}px`).toBeLessThanOrEqual(
+      shut.viewport,
     );
+
+    await page.getByRole("button", { name: TRIGGER }).click();
+    await expect(page.locator("#contact-form")).toBeVisible();
+
+    const open = await page.evaluate(() => {
+      const dialog = document.querySelector("#contact-dialog");
+      return {
+        document: document.documentElement.scrollWidth,
+        viewport: window.innerWidth,
+        dialogScroll: dialog.scrollWidth,
+        dialogClient: dialog.clientWidth,
+        dialogRight: Math.round(dialog.getBoundingClientRect().right),
+      };
+    });
+    expect(open.document, `overflow with the modal open at ${width}px`).toBeLessThanOrEqual(
+      open.viewport,
+    );
+    expect(open.dialogScroll, `dialog scrolls sideways at ${width}px`).toBeLessThanOrEqual(
+      open.dialogClient,
+    );
+    expect(open.dialogRight, `dialog past the viewport at ${width}px`).toBeLessThanOrEqual(
+      open.viewport,
+    );
+
+    // A 16px minimum keeps iOS Safari from zooming the viewport on focus.
+    for (const selector of [
+      "#contact-name",
+      "#contact-email",
+      "#contact-message",
+    ]) {
+      const size = await page
+        .locator(selector)
+        .evaluate((node) => parseFloat(getComputedStyle(node).fontSize));
+      expect(size, `${selector} at ${width}px`).toBeGreaterThanOrEqual(16);
+    }
+    await page.keyboard.press("Escape");
   }
 });
 
+test("the modal scrolls itself rather than locking the page", async ({ page }) => {
+  await openForm(page);
+  // Locking the document would mean overflow:hidden on the root, which takes the
+  // desktop scrollbar away and shifts the whole page sideways by its width.
+  const root = await page.evaluate(() => ({
+    html: getComputedStyle(document.documentElement).overflow,
+    body: getComputedStyle(document.body).overflow,
+    dialogY: getComputedStyle(document.querySelector("#contact-dialog")).overflowY,
+  }));
+  expect(root.html).not.toBe("hidden");
+  expect(root.body).not.toBe("hidden");
+  expect(root.dialogY).toBe("auto");
+  // And it never grows past the viewport, so the submit button is always reachable.
+  const fits = await page.evaluate(() => {
+    const box = document.querySelector("#contact-dialog").getBoundingClientRect();
+    return box.top >= 0 && box.bottom <= window.innerHeight + 1;
+  });
+  expect(fits).toBe(true);
+});
+
+// ---------------------------------------------------------------------------
+// axe-core. The two Playwright projects run every test at 1440x1000 and at
+// 390x844, so one test per state covers both viewports.
+// ---------------------------------------------------------------------------
+test("axe finds nothing on the page as it loads", async ({ page }) => {
+  await page.goto("/#early-access");
+  await settle(page);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("axe finds nothing with the modal open", async ({ page }) => {
+  await openForm(page);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("axe finds nothing with the modal open and errors showing", async ({
+  page,
+}) => {
+  await openForm(page);
+  await page.getByRole("button", { name: "Send message" }).click();
+  await expect(page.locator("#contact-name-error")).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+// ---------------------------------------------------------------------------
+// The baseline the modal is layered on top of.
+// ---------------------------------------------------------------------------
 test.describe("without JavaScript", () => {
   // reducedMotion because the site's own `prefers-reduced-motion` block sets
-  // `html { scroll-behavior: auto }`. Without it the checkbox sits ~5700px down,
-  // so Playwright has to scroll it into view, smooth scrolling makes that a
+  // `html { scroll-behavior: auto }`. Without it the checkbox sits a long way
+  // down, so Playwright has to scroll it into view, smooth scrolling makes that a
   // glide, and every retry restarts the glide -- the element is never stable and
   // the click is refused until the test times out. Geometry is otherwise
   // provably still; this is the scroll, not the hero animation.
   test.use({ javaScriptEnabled: false, reducedMotion: "reduce" });
 
-  test("the form still posts natively to Formspree", async ({ page }) => {
+  test("the form is in the page, in the flow, and posts natively to Formspree", async ({
+    page,
+  }) => {
     let posted = null;
     await page.route(FORMSPREE, (route) => {
       const request = route.request();
@@ -536,16 +832,50 @@ test.describe("without JavaScript", () => {
       });
     });
 
-    // No fragment: `html { scroll-behavior: smooth }` would leave the document
-    // gliding, and every element's viewport box moves while it does, so a click
-    // is refused as unstable. settle() cannot help here because it runs
-    // waitForFunction, which needs the JavaScript this test switches off.
-    // Playwright scrolls the element in itself, through CDP, instantly.
-    // networkidle so the font files are in before anything is clicked; the swap
-    // reflows the page and moves the form. The fragment lands the form in view
-    // instantly under reduced motion, so nothing has to be scrolled to.
+    // No fragment scrolling to wait out: settle() runs waitForFunction, which
+    // needs the JavaScript this test switches off. Playwright scrolls elements in
+    // itself, through CDP, instantly. networkidle so the font files are in before
+    // anything is clicked; the swap reflows the page and moves the form.
     await page.goto("/#early-access", { waitUntil: "networkidle" });
     await settleBox(page.locator("#contact-consent"));
+
+    // The dialog still carries the `open` it shipped with, because nothing ran to
+    // take it off, and `open` is what keeps the form rendered.
+    await expect(page.locator("#contact-dialog")).toHaveAttribute("open", "");
+    await expect(page.locator("#contact-form")).toBeVisible();
+    // In the flow, not floating: the UA stylesheet's `position: absolute` has to
+    // be overridden or the form lands on top of whatever follows it.
+    const layout = await page.evaluate(() => {
+      const dialog = document.querySelector("#contact-dialog");
+      const footer = document.querySelector(".footer");
+      return {
+        position: getComputedStyle(dialog).position,
+        dialogBottom: dialog.getBoundingClientRect().bottom + window.scrollY,
+        footerTop: footer.getBoundingClientRect().top + window.scrollY,
+      };
+    });
+    expect(layout.position).toBe("static");
+    expect(layout.dialogBottom).toBeLessThanOrEqual(layout.footerTop);
+
+    // No dead controls. The trigger only calls showModal(), and the close button
+    // has nothing to close, so neither is on screen.
+    await expect(page.getByRole("button", { name: TRIGGER })).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Close contact form" }),
+    ).toBeHidden();
+    // The mail-client alternative is not hidden with them.
+    await expect(
+      page.locator(".contact-launch").getByRole("link", {
+        name: "contactus@etawise.tech",
+      }),
+    ).toBeVisible();
+    // No sideways overflow from a dialog sitting in a grid it was not sized for.
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+
     // Native constraint validation is the baseline here: the markup ships
     // without novalidate, so the browser enforces the rules on its own.
     await expect(page.locator("#contact-form")).not.toHaveAttribute(

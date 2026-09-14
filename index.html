@@ -457,10 +457,36 @@
           </div>
         </div>
         <div class="steps">
+          <!-- ==========================================================
+          SECTION ICONS. Six hand-drawn marks, three here and three in #ai, on
+          a shared 24-unit grid with one stroke weight. Inline so they cost no
+          extra request and so `stroke: currentColor` lets the same markup read
+          on paper and on the dark AI panel.
+
+          Purely decorative: the <h3> beside each one already carries the
+          meaning, so they are aria-hidden with no <title>. A screen reader
+          would only hear the heading twice.
+
+          Geometry notes live with the CSS in src/style.css (.section-icon).
+          ========================================================== -->
           <article>
             <span class="step-number"
               >01<span aria-hidden="true">&#8599;</span></span
             >
+            <!-- Two rules narrowing into a rounded container: pasted notes
+            gathered into one case. Accent marks the stored context. -->
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M4.5 3.5h15" />
+              <path d="M7.75 8h8.5" />
+              <rect x="3.5" y="13" width="17" height="7.5" rx="2.25" />
+              <circle class="section-icon-fill" cx="7.5" cy="16.75" r="1.4" />
+              <path d="M11.5 16.75h6.5" />
+            </svg>
             <h3>Bring the context.</h3>
             <p>
               Start with pasted ticket notes or conversation exports. Keep the
@@ -473,6 +499,25 @@
             <span class="step-number"
               >02<span aria-hidden="true">&#10022;</span></span
             >
+            <!-- Four stacked rules with the third picked out in accent and
+            marked by the site's spark: one commitment found among many. -->
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M3.75 4.5h13.5" />
+              <path d="M3.75 9.5h16.5" />
+              <path class="section-icon-accent" d="M3.75 14.5h9" />
+              <!-- The site's spark, drawn out: a four-point star with the same
+              concave waist as the &#10022; used in the prototype panel. -->
+              <path
+                class="section-icon-spark"
+                d="M18.2 11.7 18.77 13.93 21 14.5 18.77 15.07 18.2 17.3 17.63 15.07 15.4 14.5 17.63 13.93Z"
+              />
+              <path d="M3.75 19.5h12" />
+            </svg>
             <h3>Find the commitments.</h3>
             <p>
               ETAwise summarises the ticket and suggests owners, next actions,
@@ -485,6 +530,18 @@
             <span class="step-number"
               >03<span aria-hidden="true">&#8594;</span></span
             >
+            <!-- A thin ring echoing the hero .orbit, one hand, and a single
+            accent marker on the circumference: a dated commitment tracked. -->
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle cx="12" cy="12" r="8" />
+              <path d="M12 12 L14.8 7.2" />
+              <circle class="section-icon-fill" cx="16" cy="5.1" r="1.6" />
+            </svg>
             <h3>Keep the next step visible.</h3>
             <p>
               Once your team confirms the details, track update deadlines and
@@ -590,6 +647,21 @@
             <article>
               <span>01 /</span>
               <div>
+                <!-- Three rows of text where the fourth turns back on itself
+                and points at the accent source line: a suggestion returning to
+                its evidence. Decorative; see the note in #how-it-works. -->
+                <svg
+                  class="section-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path class="section-icon-accent" d="M5 4.5h15" />
+                  <path d="M11 11.5h9" />
+                  <path d="M11 15.5h5.5" />
+                  <path d="M20 19.5H9a3 3 0 0 1-3-3V7" />
+                  <path d="M3.9 9.1 L6 7 L8.1 9.1" />
+                </svg>
                 <h3>Evidence before inference.</h3>
                 <p>
                   Suggested commitments should point back to source messages.
@@ -600,6 +672,20 @@
             <article>
               <span>02 /</span>
               <div>
+                <!-- Two rows, same marker size, one filled and one hollow, with
+                the unconfirmed row's rule left short. A committed update and an
+                unknown fix are not the same record. -->
+                <svg
+                  class="section-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <circle class="section-icon-fill" cx="6" cy="7.5" r="2.5" />
+                  <path d="M12 7.5h8" />
+                  <circle cx="6" cy="16.5" r="2.5" />
+                  <path d="M12 16.5h4" />
+                </svg>
                 <h3>An update isn't a fix.</h3>
                 <p>
                   A promised check-in is not a resolution ETA. ETAwise is not
@@ -610,6 +696,22 @@
             <article>
               <span>03 /</span>
               <div>
+                <!-- A proposed item as two quiet rules, confirmed by the site's
+                own check glyph drawn out in accent. The confirmation is the only
+                thing highlighted, because it is the part a person does. -->
+                <svg
+                  class="section-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M4.5 5h13" />
+                  <path d="M4.5 9.5h8.5" />
+                  <path
+                    class="section-icon-accent"
+                    d="M9 16 L12.5 19.5 L19.5 12.5"
+                  />
+                </svg>
                 <h3>Assistance, not autopilot.</h3>
                 <p>
                   Your team reviews AI suggestions. Confirmed dates drive
@@ -662,7 +764,7 @@
             </div>
           </div>
         </div>
-        <div class="contact-block">
+        <div class="contact-block" id="contact-block">
           <div class="contact-intro">
             <p class="micro contact-kicker">
               <span class="orange-dot"></span> GET IN TOUCH
@@ -675,148 +777,209 @@
               an early-access list.
             </p>
           </div>
-          <p class="contact-summary" id="contact-summary" aria-live="polite"></p>
-          <!-- ==========================================================
-          FORMSPREE: this action attribute is the only place the endpoint is
-          defined; src/main.js reads it back off the form. The form ID is public
-          by design — it travels in the page every visitor downloads — so it
-          belongs in the repository, and there is no key or environment variable
-          to set anywhere. The guard in src/main.js still refuses to submit if
-          the ID is ever replaced by a placeholder, rather than posting into a
-          void or reporting a success that never happened.
-          ========================================================== -->
-          <!-- No `novalidate`: without JavaScript the browser's own constraint
-          validation is the safety net, and the native POST straight to
-          Formspree still works. src/main.js switches native validation off
-          once it runs so it can own the messages and their announcements. -->
-          <form
-            class="contact-form"
-            id="contact-form"
-            action="https://formspree.io/f/maeygdzk"
-            method="post"
-            aria-labelledby="contact-form-title"
-          >
-            <div class="field">
-              <label for="contact-name">Your name</label>
-              <input
-                id="contact-name"
-                name="name"
-                type="text"
-                required
-                minlength="2"
-                maxlength="80"
-                autocomplete="name"
-                autocapitalize="words"
-              />
-              <p class="field-error" id="contact-name-error" hidden>
-                <span class="field-error-mark" aria-hidden="true">&#9888;</span
-                ><span class="field-error-text"></span>
-              </p>
-            </div>
-            <div class="field">
-              <label for="contact-email">Your email address</label>
-              <input
-                id="contact-email"
-                name="email"
-                type="email"
-                required
-                maxlength="254"
-                autocomplete="email"
-                autocapitalize="none"
-                spellcheck="false"
-                aria-describedby="contact-email-hint"
-              />
-              <p class="field-hint" id="contact-email-hint">
-                We reply to this address. Nothing else is sent to it.
-              </p>
-              <p class="field-error" id="contact-email-error" hidden>
-                <span class="field-error-mark" aria-hidden="true">&#9888;</span
-                ><span class="field-error-text"></span>
-              </p>
-            </div>
-            <div class="field">
-              <label for="contact-message">Your message</label>
-              <textarea
-                id="contact-message"
-                name="message"
-                rows="5"
-                required
-                minlength="10"
-                maxlength="2000"
-                aria-describedby="contact-message-hint"
-              ></textarea>
-              <p class="field-hint" id="contact-message-hint">
-                Between 10 and 2000 characters.
-              </p>
-              <p class="field-error" id="contact-message-error" hidden>
-                <span class="field-error-mark" aria-hidden="true">&#9888;</span
-                ><span class="field-error-text"></span>
-              </p>
-            </div>
-            <div class="field field-consent">
-              <div class="consent-row">
-                <input
-                  id="contact-consent"
-                  name="consent"
-                  type="checkbox"
-                  value="yes"
-                  required
-                />
-                <label for="contact-consent"
-                  >Submitting this form sends my name, email address, and
-                  message to ETAwise, and ETAwise stores them in order to
-                  reply.</label
-                >
-              </div>
-              <p class="field-error" id="contact-consent-error" hidden>
-                <span class="field-error-mark" aria-hidden="true">&#9888;</span
-                ><span class="field-error-text"></span>
-              </p>
-            </div>
-            <!-- Honeypot. Bots fill fields they cannot see; people never see
-            this one. Named `_gotcha` so Formspree's own filtering discards any
-            submission that arrives with it filled, on top of the check in
-            src/main.js. Positioned off-screen rather than display:none, and
-            hidden from assistive technology, so a person cannot reach it and a
-            screen reader never announces it. -->
-            <div class="offscreen-field" aria-hidden="true">
-              <label for="contact-gotcha">Leave this field empty</label>
-              <input
-                id="contact-gotcha"
-                name="_gotcha"
-                type="text"
-                tabindex="-1"
-                autocomplete="off"
-              />
-            </div>
-            <!-- Sets the subject line of the email Formspree forwards to us. -->
-            <input
-              type="hidden"
-              name="_subject"
-              value="New enquiry from the ETAwise website"
-            />
-            <div class="contact-actions">
-              <button class="button button-dark" type="submit">
-                <span class="button-label">Send message</span
-                ><span aria-hidden="true">&#8599;</span>
+          <div class="contact-launch">
+            <!-- The trigger is hidden until src/main.js marks this block as
+            enhanced. A button whose only job is to call showModal() is a dead
+            control without JavaScript, and with JavaScript off the <dialog open>
+            below is already standing in the flow carrying the form itself, so
+            there is nothing for the trigger to reveal. One attribute flip does
+            both halves of the swap, so there is no intermediate state where the
+            form is unreachable. -->
+            <div class="contact-launch-action">
+              <button class="button button-dark" type="button" id="contact-open">
+                Open the contact form
               </button>
-              <p class="contact-footnote">
-                Rather use your own mail client? Write to
-                <a href="mailto:contactus@etawise.tech?subject=ETAwise%20enquiry"
-                  >contactus@etawise.tech</a
-                >.
-              </p>
             </div>
-          </form>
-          <p
-            class="contact-status"
-            id="contact-status"
-            role="status"
-            aria-live="polite"
+            <!-- Deliberately outside .contact-launch-action: this route has to
+            stay visible whether or not the trigger does, because it is the
+            fallback for anyone the form fails. -->
+            <p class="contact-footnote">
+              Rather use your own mail client? Write to
+              <a href="mailto:contactus@etawise.tech?subject=ETAwise%20enquiry"
+                >contactus@etawise.tech</a
+              >.
+            </p>
+          </div>
+          <!-- ==========================================================
+          PROGRESSIVE ENHANCEMENT: the form ships inside a <dialog open>.
+          `open` on a dialog renders it without putting it in the top layer, so
+          with scripting off the visitor gets the form in the page exactly as
+          before and the native POST below still works. src/main.js removes
+          `open` on init and wires #contact-open to showModal() instead.
+
+          Note the UA stylesheet gives a dialog `position: absolute`, not static,
+          along with its own margin, border, padding and `width: fit-content`.
+          All of that is neutralised in src/style.css for the in-flow state;
+          without the `position` override the form would be pulled out of the
+          document flow and overlap the footer.
+          ========================================================== -->
+          <dialog
+            class="contact-dialog"
+            id="contact-dialog"
+            open
+            aria-labelledby="contact-dialog-title"
           >
-            <span class="contact-status-mark" aria-hidden="true"></span
-            ><span class="contact-status-text"></span>
-          </p>
+            <!-- Hidden in the in-flow state, for the same reason as the trigger:
+            without JavaScript there is nothing to close. -->
+            <div class="dialog-top">
+              <span class="micro">ETAwise / CONTACT</span
+              ><button
+                class="dialog-close"
+                id="contact-dialog-close"
+                type="button"
+                aria-label="Close contact form"
+              >
+                &#215;
+              </button>
+            </div>
+            <!-- Repeats the section heading above on purpose. The dialog needs a
+            visible heading of its own to be named by, and in the in-flow state
+            this one is hidden so the wording is never on screen twice. -->
+            <h2 id="contact-dialog-title">Send us a message.</h2>
+            <p class="contact-summary" id="contact-summary" aria-live="polite"></p>
+            <!-- ==========================================================
+            FORMSPREE: this action attribute is the only place the endpoint is
+            defined; src/main.js reads it back off the form. The form ID is public
+            by design — it travels in the page every visitor downloads — so it
+            belongs in the repository, and there is no key or environment variable
+            to set anywhere. The guard in src/main.js still refuses to submit if
+            the ID is ever replaced by a placeholder, rather than posting into a
+            void or reporting a success that never happened.
+            ========================================================== -->
+            <!-- No `novalidate`: without JavaScript the browser's own constraint
+            validation is the safety net, and the native POST straight to
+            Formspree still works. src/main.js switches native validation off
+            once it runs so it can own the messages and their announcements. -->
+            <form
+              class="contact-form"
+              id="contact-form"
+              action="https://formspree.io/f/maeygdzk"
+              method="post"
+              aria-labelledby="contact-form-title"
+            >
+              <div class="field">
+                <label for="contact-name">Your name</label>
+                <input
+                  id="contact-name"
+                  name="name"
+                  type="text"
+                  required
+                  minlength="2"
+                  maxlength="80"
+                  autocomplete="name"
+                  autocapitalize="words"
+                />
+                <p class="field-error" id="contact-name-error" hidden>
+                  <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                  ><span class="field-error-text"></span>
+                </p>
+              </div>
+              <div class="field">
+                <label for="contact-email">Your email address</label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  required
+                  maxlength="254"
+                  autocomplete="email"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  aria-describedby="contact-email-hint"
+                />
+                <p class="field-hint" id="contact-email-hint">
+                  We reply to this address. Nothing else is sent to it.
+                </p>
+                <p class="field-error" id="contact-email-error" hidden>
+                  <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                  ><span class="field-error-text"></span>
+                </p>
+              </div>
+              <div class="field">
+                <label for="contact-message">Your message</label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows="5"
+                  required
+                  minlength="10"
+                  maxlength="2000"
+                  aria-describedby="contact-message-hint"
+                ></textarea>
+                <p class="field-hint" id="contact-message-hint">
+                  Between 10 and 2000 characters.
+                </p>
+                <p class="field-error" id="contact-message-error" hidden>
+                  <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                  ><span class="field-error-text"></span>
+                </p>
+              </div>
+              <div class="field field-consent">
+                <div class="consent-row">
+                  <input
+                    id="contact-consent"
+                    name="consent"
+                    type="checkbox"
+                    value="yes"
+                    required
+                  />
+                  <label for="contact-consent"
+                    >Submitting this form sends my name, email address, and
+                    message to ETAwise, and ETAwise stores them in order to
+                    reply.</label
+                  >
+                </div>
+                <p class="field-error" id="contact-consent-error" hidden>
+                  <span class="field-error-mark" aria-hidden="true">&#9888;</span
+                  ><span class="field-error-text"></span>
+                </p>
+              </div>
+              <!-- Honeypot. Bots fill fields they cannot see; people never see
+              this one. Named `_gotcha` so Formspree's own filtering discards any
+              submission that arrives with it filled, on top of the check in
+              src/main.js. Positioned off-screen rather than display:none, and
+              hidden from assistive technology, so a person cannot reach it and a
+              screen reader never announces it. -->
+              <div class="offscreen-field" aria-hidden="true">
+                <label for="contact-gotcha">Leave this field empty</label>
+                <input
+                  id="contact-gotcha"
+                  name="_gotcha"
+                  type="text"
+                  tabindex="-1"
+                  autocomplete="off"
+                />
+              </div>
+              <!-- Sets the subject line of the email Formspree forwards to us. -->
+              <input
+                type="hidden"
+                name="_subject"
+                value="New enquiry from the ETAwise website"
+              />
+              <!-- The mail-client alternative moved out to .contact-launch in the
+              section, so it stays on screen whether or not this dialog is open. -->
+              <div class="contact-actions">
+                <button class="button button-dark" type="submit">
+                  <span class="button-label">Send message</span
+                  ><span aria-hidden="true">&#8599;</span>
+                </button>
+              </div>
+            </form>
+            <!-- Inside the dialog, because every state it reports except success
+            is something the visitor has to read while the form is still in front
+            of them. Success is handled the other way round: src/main.js puts a
+            confirmation into the section and closes the dialog, so the outcome
+            does not disappear with it. -->
+            <p
+              class="contact-status"
+              id="contact-status"
+              role="status"
+              aria-live="polite"
+            >
+              <span class="contact-status-mark" aria-hidden="true"></span
+              ><span class="contact-status-text"></span>
+            </p>
+          </dialog>
         </div>
       </section>
     </main>
@@ -844,10 +1007,16 @@
         </div>
       </div>
     </footer>
-    <dialog aria-labelledby="dialog-title">
+    <!-- The source-message and legal-notice dialog. Carries an id because it is
+    no longer the only <dialog> in the document: the contact form now ships in
+    one too, earlier in the page, so `querySelector("dialog")` would reach the
+    wrong element. -->
+    <dialog class="notice-dialog" id="notice-dialog" aria-labelledby="dialog-title">
       <div class="dialog-top">
         <span class="micro">ETAwise / INFORMATION</span
-        ><button class="dialog-close" aria-label="Close dialog">&#215;</button>
+        ><button class="dialog-close" type="button" aria-label="Close dialog">
+          &#215;
+        </button>
       </div>
       <h2 id="dialog-title">Website information</h2>
       <div id="dialog-content"></div>

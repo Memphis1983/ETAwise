@@ -109,8 +109,36 @@ document.querySelectorAll("[data-case]").forEach((button) => {
   });
 });
 
-const dialog = document.querySelector("dialog");
+// Two dialogs in the document now: this one for source messages and legal
+// notices, and the contact form's. Both are addressed by id, because
+// querySelector("dialog") would reach whichever comes first in the markup.
+const noticeDialog = document.querySelector("#notice-dialog");
+const contactDialog = document.querySelector("#contact-dialog");
+
+// Clicking the backdrop closes a modal. There is no backdrop element to listen
+// on, so the click lands on the dialog itself and has to be told apart from a
+// click on its contents by comparing against the dialog's own box. Shared by
+// both dialogs rather than written twice.
+function closeOnBackdropClick(element) {
+  element.addEventListener("click", (event) => {
+    if (event.target !== element) return;
+    const bounds = element.getBoundingClientRect();
+    if (
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom
+    )
+      element.close();
+  });
+}
+
 function showNotice(title, paragraphs) {
+  // showModal() makes the rest of the document inert, so the footer buttons that
+  // land here cannot be reached while the contact form is open and the two can
+  // never stack. Closing it anyway costs two lines and does not rely on that
+  // staying true.
+  if (contactDialog && contactDialog.open) contactDialog.close();
   document.getElementById("dialog-title").textContent = title;
   document.getElementById("dialog-content").replaceChildren(
     ...paragraphs.map((text) => {
@@ -119,7 +147,7 @@ function showNotice(title, paragraphs) {
       return paragraph;
     }),
   );
-  dialog.showModal();
+  noticeDialog.showModal();
 }
 document.querySelector(".source-button").addEventListener("click", () => {
   showNotice("Fictional source message", [
@@ -152,20 +180,10 @@ document.querySelectorAll("[data-notice]").forEach((button) => {
     showNotice(...notices[button.dataset.notice]),
   );
 });
-document
+noticeDialog
   .querySelector(".dialog-close")
-  .addEventListener("click", () => dialog.close());
-dialog.addEventListener("click", (event) => {
-  if (event.target !== dialog) return;
-  const bounds = dialog.getBoundingClientRect();
-  if (
-    event.clientX < bounds.left ||
-    event.clientX > bounds.right ||
-    event.clientY < bounds.top ||
-    event.clientY > bounds.bottom
-  )
-    dialog.close();
-});
+  .addEventListener("click", () => noticeDialog.close());
+closeOnBackdropClick(noticeDialog);
 document.getElementById("year").textContent = new Date().getFullYear();
 
 // ---------------------------------------------------------------------------
@@ -185,6 +203,10 @@ document.getElementById("year").textContent = new Date().getFullYear();
 // validation we control. Formspree runs its own server-side checks and spam
 // filtering on top, but that layer is theirs, we cannot see or configure it
 // from here, and passing these checks does not mean a submission is accepted.
+//
+// Step 2 also moves the form into a modal. The markup ships it inside a
+// `<dialog open>`, which renders the form in the page, so the no-JavaScript
+// baseline above is untouched by that. Everything modal about it happens here.
 // ---------------------------------------------------------------------------
 const contactForm = document.querySelector("#contact-form");
 if (contactForm) initContactForm(contactForm);
@@ -204,7 +226,6 @@ function initContactForm(form) {
   const MIN_ELAPSED_MS = 3000;
   const EMAIL_SHAPE = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
 
-  const loadedAt = Date.now();
   const summary = document.getElementById("contact-summary");
   const status = document.getElementById("contact-status");
   const statusMark = status.querySelector(".contact-status-mark");
@@ -213,9 +234,77 @@ function initContactForm(form) {
   const submitLabel = submitButton.querySelector(".button-label");
   const idleLabel = submitLabel.textContent;
   const honeypot = form.querySelector('[name="_gotcha"]');
+  const block = document.getElementById("contact-block");
+  const launch = block.querySelector(".contact-launch");
+  const trigger = document.getElementById("contact-open");
+  const heading = document.getElementById("contact-dialog-title");
   let submitting = false;
 
   form.noValidate = true;
+
+  // -------------------------------------------------------------------------
+  // The modal.
+  //
+  // One synchronous flip, before anything can be clicked: the dialog leaves the
+  // flow and the trigger arrives in the same style recalculation, so there is no
+  // paint in which the form is neither inline nor openable. Removing `open` also
+  // means that from here on an `open` attribute can only have come from
+  // showModal(), which is what the CSS keys off to tell the two states apart.
+  // -------------------------------------------------------------------------
+  contactDialog.removeAttribute("open");
+  block.setAttribute("data-contact-enhanced", "true");
+  // Only true once this code has run. Announcing a popup on a button that cannot
+  // open one would be a lie, so these are set here and not in the markup.
+  trigger.setAttribute("aria-haspopup", "dialog");
+  trigger.setAttribute("aria-controls", contactDialog.id);
+  // Focus target on open. Not a form control, so it needs to be programmatically
+  // focusable without joining the tab order.
+  heading.tabIndex = -1;
+
+  // The 3-second floor is measured from the moment the form becomes reachable,
+  // not from page load.
+  //
+  // Page-load timing made sense when the form was already on the page. Behind a
+  // button it cannot: opening the modal, reading it, and typing a message takes
+  // longer than three seconds every time, so the guard could never fire and
+  // would be protection in name only. Measuring from the open means it still
+  // catches a fill-and-send with no reading in between, which is the thing it
+  // was for. The cost is a visitor who pastes a prepared message and sends
+  // inside three seconds, and that costs them one more click: the message is
+  // still in the form and the status line says to send it again.
+  let formReadyAt = Date.now();
+
+  function openContact() {
+    if (contactDialog.open) return;
+    formReadyAt = Date.now();
+    contactDialog.showModal();
+    // The heading rather than the first field: it names the dialog on arrival,
+    // and it does not throw up the on-screen keyboard on a phone before the
+    // visitor has seen what they opened. showModal() would otherwise land on the
+    // close button, which is the least useful control in here.
+    heading.focus();
+  }
+
+  function closeContact() {
+    if (contactDialog.open) contactDialog.close();
+  }
+
+  trigger.addEventListener("click", openContact);
+  contactDialog
+    .querySelector(".dialog-close")
+    .addEventListener("click", closeContact);
+  closeOnBackdropClick(contactDialog);
+  // Escape and the focus trap are showModal()'s own, not reimplemented here.
+  contactDialog.addEventListener("close", () => {
+    // A dialog restores focus to whatever had it before showModal() on its own,
+    // which is the trigger in every case but one: after a successful send the
+    // trigger has been replaced by the confirmation, so that takes the focus
+    // instead and the visitor lands on the outcome.
+    const target = document.contains(trigger)
+      ? trigger
+      : block.querySelector(".contact-confirmation");
+    if (target) target.focus();
+  });
 
   const fields = [
     {
@@ -354,23 +443,34 @@ function initContactForm(form) {
     invalid[0].input.focus();
   }
 
+  // The confirmation lands in the section, in place of the button that opened the
+  // modal, and the modal closes behind it.
+  //
+  // Leaving it inside the modal was the other option, and it loses the outcome
+  // the moment the visitor presses Escape or clicks the backdrop -- which they
+  // will, because a modal reading "Message sent." is finished with. They would be
+  // left looking at an unchanged section with an "Open the contact form" button
+  // on it and no way to tell whether anything was sent. In the section it stays
+  // on the page, it replaces the control that no longer has a job, and it is
+  // where the visitor's eye already was before the modal opened.
   function showConfirmation() {
     const panel = document.createElement("div");
     panel.className = "contact-confirmation";
     panel.tabIndex = -1;
-    const heading = document.createElement("h4");
-    heading.textContent = "Message sent.";
+    const title = document.createElement("h4");
+    title.textContent = "Message sent.";
     const lead = document.createElement("p");
     lead.textContent =
       "Thank you. Your message is with the ETAwise team and we will reply by email to the address you gave us.";
     const note = document.createElement("p");
     note.textContent =
       "This was a message, not a signup. You have not been added to any early-access list and no account has been created.";
-    panel.append(heading, lead, note);
-    form.replaceWith(panel);
-    // Focus was on the submit button, which has just been removed, so move it
-    // somewhere deliberate instead of letting it fall back to the document.
-    panel.focus();
+    panel.append(title, lead, note);
+    // The form goes rather than staying filled in a dialog nothing can reopen.
+    form.remove();
+    launch.replaceWith(panel);
+    // Focus follows in the dialog's `close` handler, which finds this panel
+    // because the trigger it would otherwise return to has just been detached.
   }
 
   // Formspree reports a rejection as a JSON `errors` array, each entry carrying
@@ -482,7 +582,7 @@ function initContactForm(form) {
     // no-JavaScript path still posts it, and Formspree's own honeypot handling
     // is what guards that route.
     honeypot.value = "";
-    if (Date.now() - loadedAt < MIN_ELAPSED_MS) {
+    if (Date.now() - formReadyAt < MIN_ELAPSED_MS) {
       setStatus(
         "error",
         "That was submitted very quickly. Take a moment to check your message, then send it again.",
@@ -517,6 +617,7 @@ function initContactForm(form) {
       if (response.ok) {
         setStatus("success", "Message sent. Thank you for getting in touch.");
         showConfirmation();
+        closeContact();
         return;
       }
       await handleRejection(response);

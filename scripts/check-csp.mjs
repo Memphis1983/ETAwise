@@ -91,9 +91,16 @@ if ((await page.locator("#case-title").textContent()) !== "On-site visit confirm
   problems.push("prototype switcher did not run");
 
 await page.getByRole("button", { name: "Privacy", exact: true }).click();
-if (!(await page.getByRole("dialog").isVisible()))
+if (!(await page.locator("#notice-dialog").isVisible()))
   problems.push("privacy dialog did not open");
 await page.getByRole("button", { name: "Close dialog" }).click();
+
+// The form lives in a modal now, so it has to be opened before anything in it can
+// be exercised. This is also what proves showModal() itself survives the policy.
+await page.getByRole("button", { name: "Open the contact form" }).click();
+if (!(await page.locator("#contact-dialog").isVisible()))
+  problems.push("contact modal did not open");
+const modalOpenedAt = Date.now();
 
 await page.getByRole("button", { name: /Send message/ }).click();
 if (!(await page.locator("#contact-name-error").isVisible()))
@@ -119,7 +126,10 @@ await page.fill("#contact-name", "Casey Quinn");
 await page.fill("#contact-email", "casey@example.com");
 await page.fill("#contact-message", "Checking the form under the policy.");
 await page.check("#contact-consent");
-await page.waitForTimeout(3100);
+// The 3-second floor runs from the moment the modal opened, not from page load.
+await page.waitForTimeout(
+  Math.max(0, 3100 - (Date.now() - modalOpenedAt)),
+);
 await page.getByRole("button", { name: /Send message/ }).click();
 try {
   // The submit is a fetch, so this one has to be waited for rather than read.
