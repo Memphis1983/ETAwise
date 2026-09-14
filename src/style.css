@@ -957,7 +957,9 @@ h1 .serif {
   font-family: var(--serif);
   font-size: 30px;
   color: #68725b;
-  margin-bottom: 30px;
+  /* Was 30px, when this row sat directly above the h3. The icon now follows it
+     and carries its own gap, so the number and the mark read as one group. */
+  margin-bottom: 18px;
 }
 .step-number > span {
   font-size: 23px;
@@ -978,6 +980,57 @@ h1 .serif {
   font-size: 10px;
   color: #707667;
   letter-spacing: 1.1px;
+}
+/* Section icons -------------------------------------------------------------
+   One shared system for the six inline marks in #how-it-works and #ai. Every
+   icon is drawn on a 24-unit viewBox at a single 1.5 stroke, round caps and
+   joins, so they carry the same optical weight wherever they sit. Coordinates
+   are kept inside a ~2.75-unit margin on all four sides, which is what stops
+   one icon looking larger than its neighbour.
+
+   Sizing lives on font-size, with the box at 1em square, so the size is one
+   property per breakpoint and no width/height attributes have to be kept in
+   sync in the markup. All six take the same size at a given width even though
+   the two sets sit above different heading sizes: a 24-unit grid scales its
+   stroke with the box, so two sizes would mean two rendered stroke weights and
+   the set would stop looking like a set. 32/24 puts the stroke at 2px, which is
+   about the stem weight of the headings beside it.
+
+   Stroke inherits, so `stroke` and `stroke-width` set here reach every child.
+   `fill: none` inherits too, which is why the filled markers set their own. */
+.section-icon {
+  --icon-accent: var(--accent);
+  display: block;
+  width: 1em;
+  height: 1em;
+  font-size: 32px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* One accent element per icon, and only ever the thing the heading is about:
+   the found commitment, the source line, the confirmed check. Everything
+   structural stays in the section's own ink. */
+.section-icon-accent {
+  stroke: var(--icon-accent);
+}
+.section-icon-fill {
+  fill: var(--icon-accent);
+  stroke: var(--icon-accent);
+}
+/* The spark is the only closed shape in the set with concave corners, so it is
+   the only one that has to opt out of the shared stroke: a 1.5 outline would
+   fill its waist in and round its points off. Its 5.6-unit width matches the
+   outer diameter of the round markers instead. */
+.section-icon-spark {
+  fill: var(--icon-accent);
+  stroke: none;
+}
+.steps .section-icon {
+  color: #68725b;
+  margin-bottom: 20px;
 }
 .ai-section {
   background: #282d25;
@@ -1029,7 +1082,17 @@ h1 .serif {
   font-family: monospace;
   font-size: 12px;
   white-space: nowrap;
-  padding-top: 5px;
+  /* Was 5px, to sit the marker on the h3's cap height. The icon now leads the
+     text column, so the marker centres against that instead. */
+  padding-top: 8px;
+}
+/* Inside this panel the site's accent mark is --orange, not --accent: see the
+   .orange-dot in .development-label above. The icons follow that, and take the
+   marker's own ink so the rail and the mark read as one column. */
+.ai-principles .section-icon {
+  --icon-accent: var(--orange);
+  color: #c6cebb;
+  margin-bottom: 14px;
 }
 .ai-principles h3 {
   font-size: 17px;
@@ -1448,6 +1511,10 @@ dialog p:last-child {
   .steps h3 {
     font-size: 17px;
   }
+  /* One value for all six, for the reason given at .section-icon. */
+  .section-icon {
+    font-size: 28px;
+  }
   .steps p {
     font-size: 13px;
   }
@@ -1775,10 +1842,13 @@ dialog p:last-child {
   }
   .step-number {
     font-size: 29px;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
   .steps h3 {
     font-size: 21px;
+  }
+  .steps .section-icon {
+    margin-bottom: 16px;
   }
   .steps p {
     font-size: 14px;
@@ -1795,6 +1865,9 @@ dialog p:last-child {
   }
   .ai-principles h3 {
     font-size: 16px;
+  }
+  .ai-principles .section-icon {
+    margin-bottom: 12px;
   }
   .ai-principles p {
     font-size: 13px;

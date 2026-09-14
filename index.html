@@ -457,10 +457,36 @@
           </div>
         </div>
         <div class="steps">
+          <!-- ==========================================================
+          SECTION ICONS. Six hand-drawn marks, three here and three in #ai, on
+          a shared 24-unit grid with one stroke weight. Inline so they cost no
+          extra request and so `stroke: currentColor` lets the same markup read
+          on paper and on the dark AI panel.
+
+          Purely decorative: the <h3> beside each one already carries the
+          meaning, so they are aria-hidden with no <title>. A screen reader
+          would only hear the heading twice.
+
+          Geometry notes live with the CSS in src/style.css (.section-icon).
+          ========================================================== -->
           <article>
             <span class="step-number"
               >01<span aria-hidden="true">&#8599;</span></span
             >
+            <!-- Two rules narrowing into a rounded container: pasted notes
+            gathered into one case. Accent marks the stored context. -->
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M4.5 3.5h15" />
+              <path d="M7.75 8h8.5" />
+              <rect x="3.5" y="13" width="17" height="7.5" rx="2.25" />
+              <circle class="section-icon-fill" cx="7.5" cy="16.75" r="1.4" />
+              <path d="M11.5 16.75h6.5" />
+            </svg>
             <h3>Bring the context.</h3>
             <p>
               Start with pasted ticket notes or conversation exports. Keep the
@@ -473,6 +499,25 @@
             <span class="step-number"
               >02<span aria-hidden="true">&#10022;</span></span
             >
+            <!-- Four stacked rules with the third picked out in accent and
+            marked by the site's spark: one commitment found among many. -->
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M3.75 4.5h13.5" />
+              <path d="M3.75 9.5h16.5" />
+              <path class="section-icon-accent" d="M3.75 14.5h9" />
+              <!-- The site's spark, drawn out: a four-point star with the same
+              concave waist as the &#10022; used in the prototype panel. -->
+              <path
+                class="section-icon-spark"
+                d="M18.2 11.7 18.77 13.93 21 14.5 18.77 15.07 18.2 17.3 17.63 15.07 15.4 14.5 17.63 13.93Z"
+              />
+              <path d="M3.75 19.5h12" />
+            </svg>
             <h3>Find the commitments.</h3>
             <p>
               ETAwise summarises the ticket and suggests owners, next actions,
@@ -485,6 +530,18 @@
             <span class="step-number"
               >03<span aria-hidden="true">&#8594;</span></span
             >
+            <!-- A thin ring echoing the hero .orbit, one hand, and a single
+            accent marker on the circumference: a dated commitment tracked. -->
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <circle cx="12" cy="12" r="8" />
+              <path d="M12 12 L14.8 7.2" />
+              <circle class="section-icon-fill" cx="16" cy="5.1" r="1.6" />
+            </svg>
             <h3>Keep the next step visible.</h3>
             <p>
               Once your team confirms the details, track update deadlines and
@@ -590,6 +647,21 @@
             <article>
               <span>01 /</span>
               <div>
+                <!-- Three rows of text where the fourth turns back on itself
+                and points at the accent source line: a suggestion returning to
+                its evidence. Decorative; see the note in #how-it-works. -->
+                <svg
+                  class="section-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path class="section-icon-accent" d="M5 4.5h15" />
+                  <path d="M11 11.5h9" />
+                  <path d="M11 15.5h5.5" />
+                  <path d="M20 19.5H9a3 3 0 0 1-3-3V7" />
+                  <path d="M3.9 9.1 L6 7 L8.1 9.1" />
+                </svg>
                 <h3>Evidence before inference.</h3>
                 <p>
                   Suggested commitments should point back to source messages.
@@ -600,6 +672,20 @@
             <article>
               <span>02 /</span>
               <div>
+                <!-- Two rows, same marker size, one filled and one hollow, with
+                the unconfirmed row's rule left short. A committed update and an
+                unknown fix are not the same record. -->
+                <svg
+                  class="section-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <circle class="section-icon-fill" cx="6" cy="7.5" r="2.5" />
+                  <path d="M12 7.5h8" />
+                  <circle cx="6" cy="16.5" r="2.5" />
+                  <path d="M12 16.5h4" />
+                </svg>
                 <h3>An update isn't a fix.</h3>
                 <p>
                   A promised check-in is not a resolution ETA. ETAwise is not
@@ -610,6 +696,22 @@
             <article>
               <span>03 /</span>
               <div>
+                <!-- A proposed item as two quiet rules, confirmed by the site's
+                own check glyph drawn out in accent. The confirmation is the only
+                thing highlighted, because it is the part a person does. -->
+                <svg
+                  class="section-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M4.5 5h13" />
+                  <path d="M4.5 9.5h8.5" />
+                  <path
+                    class="section-icon-accent"
+                    d="M9 16 L12.5 19.5 L19.5 12.5"
+                  />
+                </svg>
                 <h3>Assistance, not autopilot.</h3>
                 <p>
                   Your team reviews AI suggestions. Confirmed dates drive
