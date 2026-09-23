@@ -395,24 +395,52 @@ h1 .serif {
     transform: rotate(-387deg);
   }
 }
-/* Was a dashed border. A repeating gradient of the same weight can carry a
-   slow downward flow through background-position. */
+/* Was a dashed border, then a repeating gradient scrolled with
+   background-position. background-position is not a compositor property, so
+   every frame of that version went through layout and paint on the main thread
+   and Lighthouse counted it as a non-composited animation.
+
+   Same picture, driven by transform instead. The track keeps the geometry and
+   becomes a clip; the gradient moves to a pseudo-element that overhangs the
+   track by one dash period at the top and two at the bottom, and travels down
+   exactly one period per cycle.
+
+   Why one period, and why the overhang is what it is: the dash pattern repeats
+   every 7px, so starting the gradient 7px above the track puts the same dash
+   phase at the top of the track as background-position: 0 0 did, and finishing
+   7px lower lands the next dash exactly where the first one started. The loop
+   is seamless and the two end states match the old keyframes pixel for pixel.
+
+   The `background-size: 1px 7px` that used to be here was redundant: the
+   gradient's own period is already 7px, so tiling it at 7px and letting it
+   repeat intrinsically draw the same dashes. */
 .signal-line {
   position: absolute;
   left: 50%;
   top: 80px;
   height: 208px;
   width: 1px;
+  overflow: hidden;
+}
+.signal-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -7px;
+  width: 1px;
+  /* One period of overhang above, two below: 7px of travel plus 7px of spare,
+     so the bottom of the track is still covered at the end of the cycle. The
+     percentage keeps this correct where the media queries shorten the track. */
+  height: calc(100% + 14px);
   background: repeating-linear-gradient(#a9ae9c 0 3px, transparent 3px 7px);
-  background-size: 1px 7px;
   animation: signal-flow 7s linear infinite;
 }
 @keyframes signal-flow {
   from {
-    background-position: 0 0;
+    transform: translateY(0);
   }
   to {
-    background-position: 0 7px;
+    transform: translateY(7px);
   }
 }
 .handoff-label {
@@ -443,44 +471,82 @@ h1 .serif {
   background: linear-gradient(145deg, #fc8155, #df4b26);
   border: 1px solid #d94d2a;
   border-radius: 22px;
-  box-shadow:
-    0 16px 28px #8e694330,
-    inset 0 2px 1px #ffac85;
+  /* Only the inset highlight stays on the element. It was identical in both
+     keyframes of the float, so it was never being animated in the first place;
+     the drop shadow that was is now two cross-fading layers below. */
+  box-shadow: inset 0 2px 1px #ffac85;
   display: grid;
   place-items: center;
   animation: core-float 7s ease-in-out infinite alternate;
-  transition: scale 240ms ease-out;
+  transition:
+    scale 240ms ease-out,
+    box-shadow 240ms ease-out;
 }
+/* box-shadow is not a compositor property, so the old version of this
+   animation, which grew the drop shadow alongside the lift, ran on the main
+   thread. Lighthouse counted it as the second non-composited animation.
+   transform only now. */
 @keyframes core-float {
   from {
     transform: rotate(-8deg) translateY(0);
-    box-shadow:
-      0 16px 28px #8e694330,
-      inset 0 2px 1px #ffac85;
   }
   to {
     transform: rotate(-8deg) translateY(-6px);
-    box-shadow:
-      0 22px 36px #8e694326,
-      inset 0 2px 1px #ffac85;
   }
 }
-/* Hover shadow sits on its own layer, so deepening it does not collide with
-   the box-shadow the float animation is already driving. */
+/* The breathing shadow, as two fixed layers cross-fading on the same clock as
+   the lift: the same trick as .steps article::before and
+   .ai-principles article::before, which sit at opacity 0 and come up to 1.
+   opacity is compositable, box-shadow is not.
+   Both are inset: -1px so their border box lines up with the core's own border
+   box, which is where the shadow was cast from before, and border-radius:
+   inherit then gives them the same 22px corner. */
+.signal-core:before,
 .signal-core:after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -1px;
   border-radius: inherit;
-  box-shadow: 0 18px 30px #8e694300;
-  transition: box-shadow 240ms ease-out;
   pointer-events: none;
 }
+/* Resting: the shadow the core sits in at the bottom of the breath. Fades out
+   as it rises. */
+.signal-core:before {
+  box-shadow: 0 16px 28px #8e694330;
+  animation: core-shadow-rest 7s ease-in-out infinite alternate;
+}
+/* Lifted: further down, softer, fainter. Fades in as it rises. */
+.signal-core:after {
+  box-shadow: 0 22px 36px #8e694326;
+  opacity: 0;
+  animation: core-shadow-lift 7s ease-in-out infinite alternate;
+}
+@keyframes core-shadow-rest {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@keyframes core-shadow-lift {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Hover deepens the shadow on top of whichever float layer is showing, which is
+   what the old :after layer did by sitting at alpha 00 and coming up to 38. It
+   can live on the element's own box-shadow now: the float animation no longer
+   touches that property, so there is nothing left to collide with, and both
+   pseudo-elements are carrying the float. */
 .signal-core:hover {
   scale: 1.05;
-}
-.signal-core:hover:after {
-  box-shadow: 0 26px 44px #8e694338;
+  box-shadow:
+    inset 0 2px 1px #ffac85,
+    0 26px 44px #8e694338;
 }
 .core-symbol {
   font-family: var(--serif);
@@ -2217,7 +2283,15 @@ dialog p:last-child {
   .orbit-two,
   .orbit-three,
   .signal-line,
+  /* The dashed flow moved off the track's own background-position and onto this
+     pseudo-element's transform, so this is the selector that now has to be
+     named for the hero to be auditable line by line. */
+  .signal-line::before,
   .signal-core,
+  /* Two shadow layers now instead of one. Stopping their animations leaves
+     ::before at opacity 1 and ::after at opacity 0, which is exactly the
+     resting shadow the core used to carry statically. */
+  .signal-core:before,
   .signal-core:after,
   .core-symbol,
   .action-slip {
