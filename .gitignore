@@ -3,3 +3,6 @@ dist/
 test-results/
 playwright-report/
 .env*
+
+# Internal notes, deliberately untracked: this repository is public.
+*.local.md
