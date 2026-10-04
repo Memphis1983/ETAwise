@@ -6,3 +6,6 @@ playwright-report/
 
 # Internal notes, deliberately untracked: this repository is public.
 *.local.md
+
+# Screenshots and videos from the hero design spike. Generated, and large.
+design/_shots/

@@ -1,14 +1,170 @@
 :root {
   --paper: #f5f3ed;
   --ink: #252820;
-  --muted: #686a60;
+  --muted: #66685e;
   --line: #dcded3;
   --accent: #d74b27;
   --orange: #ee603b;
   /* Darker than --accent on purpose: the accent only reaches 3.5:1 on the
-     #e8eadd early-access panel, which fails AA for the small error text. */
+     var(--access-surface) early-access panel, which fails AA for the small error text. */
   --error: #8f2f13;
   --white: #fffefa;
+  /* #ai dark panel, tokenized in place — same values, now named (Task 1 of
+     the dark-theme-palette spec). */
+  --ai-bg: #282d25;
+  --ai-ink: #f5f3e9;
+  --ai-muted: #c0c7b6;
+  --ai-marker: #b8c4a5;
+  /* Dark hero (Task 2 of the dark-theme-palette spec). Starting-point values
+     from design.md's Architecture section, not yet locked — Task 9's full
+     contrast pass is what finalizes them (Requirement 1.4). */
+  --hero-bg: #171d16;
+  --hero-ink: #f3f3e7;
+  --hero-muted: #e6ead8;
+  --hero-light: #ff8a52;
+  --hero-texture: #f2e4b8;
+  --hero-texture-opacity: 0.38;
+  /* Ambient hero atmosphere: warm ETAwise light, not a copied image or
+     reference-site asset. The layer itself stays behind the dot texture. */
+  --hero-atmosphere-coral: #d86a44;
+  --hero-atmosphere-gold: #e9bd74;
+  --hero-atmosphere-sage: #7f9a67;
+  --hero-atmosphere-opacity: 0.28;
+  /* Gradient-mesh light-body background (Task 2 of the dark-theme-palette
+     spec). Same starting-point caveat as the hero tokens above. */
+  --mesh-1: #f0a37c;
+  --mesh-2: #e8dcc8;
+  --mesh-3: #d9c9b0;
+  /* Task 8 surface tokens: each distinct value has a semantic role; values
+     shared by more than one component intentionally reuse one token. */
+  --surface-selection: #f7c4af;
+  --surface-contrast-activity: #efeee8;
+  --surface-quiet: #faf9f4;
+  --surface-preview: #e9ece3;
+  --surface-workspace-muted: #f7f8f3;
+  --surface-workspace-hover: #eeefe7;
+  --surface-case-amber: #fff0d9;
+  --surface-case-blue: #e9eff4;
+  --surface-insight: #f2f5ed;
+  --surface-workflow-top: #eeece4;
+  --surface-workflow-hover-top: #f2f0e9;
+  --surface-form-error: #fdf5f2;
+  --surface-vignette-thread: #fbfaf6;
+  --surface-pure-white: #fff;
+  --surface-vignette-field: #eef3e7;
+  --surface-vignette-check: #eff2e9;
+  --surface-vignette-commit-dot: #ffd9c8;
+
+  /* Task 8 semantic tokens: these preserve the original literal values while
+     giving each reused surface, text, border, and shadow one source of truth. */
+  --sage-marker: #55674c;
+  --button-dark-hover: #42483a;
+  --orbit-line: #d2d4c6;
+  --orbit-inner-marker: #8e9885;
+  --orbit-outer-marker: #a3ab98;
+  --strip-label: #74796b;
+  --contrast-divider: #e1e1d7;
+  --message-icon: #8d9183;
+  --attention: #a74224;
+  --preview-border: #dadecf;
+  --preview-heading-copy: #5a6152;
+  --workspace-border: #ccd2c2;
+  --sage-shadow-soft: #3e493c12;
+  --workspace-subdivider: #e3e6db;
+  --workspace-brand-copy: #989e8c;
+  --prototype-border: #daddd2;
+  --workspace-pill-copy: #686e5f;
+  --workspace-divider: #e1e5d8;
+  --case-sidebar-copy: #676d5c;
+  --workspace-active-border: #cbd2c0;
+  --card-shadow-soft: #333b2008;
+  --case-button-meta: #606858;
+  --case-amber-text: #825418;
+  --case-blue-text: #466177;
+  --case-green-bg: #e6eddf;
+  --sage-success: #48623b;
+  --case-sub-copy: #6e7366;
+  --sidebar-copy: #707566;
+  --workspace-breadcrumb: #68705f;
+  --case-detail-copy: #686e60;
+  --metrics-divider: #e5e7dd;
+  --workspace-metric: #666e5e;
+  --insight-border: #bdcaa9;
+  --insight-meta: #656f5a;
+  --sage-spark: #506638;
+  --insight-copy: #5b6650;
+  --source-border: #aab797;
+  --workspace-source-hover: #30571a;
+  --preview-caption: #5b6553;
+  --workflow-border: #d7d5c6;
+  --workflow-rail: #bec4b3;
+  --workflow-surface-bottom: #e0dfd5;
+  --card-shadow-small: #333b200a;
+  --card-shadow-medium: #333b200d;
+  --workflow-hover-bottom: #e6e4da;
+  --workflow-hover-border: #c8c6b5;
+  --workflow-hover-rail: #aeb59f;
+  --card-shadow-hover-small: #333b2010;
+  --card-shadow-hover-large: #333b2014;
+  --step-number: #68725b;
+  --step-copy: #5d5f55;
+  --step-tag: #707667;
+
+  /* AI-panel text, card, border, and shadow tokens retain their verified
+     values while keeping the panel independent from the hero palette. */
+  --ai-eyebrow: #c0c8b6;
+  --ai-eyebrow-marker: #bcc6ae;
+  --ai-serif: #c7d3b6;
+  --ai-development: #c1c7b8;
+  --ai-card-border: #3f4739;
+  --ai-card-rail: #505747;
+  --ai-card-top: #31372e;
+  --ai-card-bottom: #2c322a;
+  --ai-shadow-soft: #0e120b40;
+  --ai-shadow-deep: #0e120b33;
+  --ai-card-hover-top: #373d33;
+  --deep-sage: #4c5445;
+  --ai-card-hover-rail: #626b57;
+  --ai-shadow-hover: #0e120b4d;
+  --ai-icon: #c6cebb;
+  --faq-marker: #79816d;
+
+  /* Early-access, dialog, and form tokens. */
+  --access-surface: #e8eadd;
+  --access-border: #d8dccb;
+  --access-stage: #626c54;
+  --access-copy: #5d6652;
+  --access-divider: #c5cdb8;
+  --access-micro: #657057;
+  --access-note-text: #435039;
+  --access-small: #647057;
+  --footer-meta: #6a7160;
+  --dialog-shadow: #0003;
+  --dialog-backdrop: #25282099;
+  --dialog-hover: #e8e9de;
+  --dialog-copy: #565d4d;
+  --ink-shadow-soft: #25282008;
+  --secondary-muted: #59624e;
+  --hero-clause: #565f4d;
+  --input-border: #c4cbb6;
+  --input-focus-border: #8f9a80;
+  --contact-success: #35502a;
+
+  /* Promoted Direction A vignette tokens. The a-* aliases below are scoped
+     to the visual; these root values hold their original design-spike hues. */
+  --vignette-sage-ink: #3f5a2c;
+  --vignette-sage-tint: #e2ebd6;
+  --vignette-sage-line: #9fb487;
+  --vignette-commit: #c4441f;
+  --vignette-rule: #e6e8df;
+  --vignette-card-border: #d6d9cc;
+  --vignette-muted: #6f7366;
+  --vignette-label: #5f6357;
+  --vignette-check-border: #b9c7a8;
+  --vignette-sweep-clear: #55674c00;
+  --vignette-sweep-fade: #55674c1f;
+  --vignette-sweep-edge: #7f9a67;
+  --sage-shadow-deep: #3e493c14;
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "DM Sans Variable", Arial, sans-serif;
 }
@@ -19,9 +175,40 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 100px;
 }
+/* Static light-body mesh (Task 6 of the dark-theme-palette spec). The body is
+   the only wrapper that also contains the footer, while the existing hero,
+   preview, AI, access, card, workspace, and dialog surfaces remain opaque
+   above it. Fixed-size ellipses and no-repeat keep each wash restrained and
+   prevent a tiled pattern without adding a layer to the DOM or layout. */
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(
+      ellipse 34rem 25rem at 8% 18%,
+      color-mix(in srgb, var(--mesh-1) 20%, transparent) 0%,
+      color-mix(in srgb, var(--mesh-1) 8%, transparent) 46%,
+      transparent 76%
+    ),
+    radial-gradient(
+      ellipse 40rem 30rem at 92% 40%,
+      color-mix(in srgb, var(--mesh-2) 42%, transparent) 0%,
+      color-mix(in srgb, var(--mesh-2) 18%, transparent) 48%,
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 36rem 28rem at 16% 67%,
+      color-mix(in srgb, var(--mesh-3) 24%, transparent) 0%,
+      color-mix(in srgb, var(--mesh-3) 10%, transparent) 52%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 44rem 32rem at 86% 91%,
+      color-mix(in srgb, var(--mesh-1) 14%, transparent) 0%,
+      color-mix(in srgb, var(--mesh-1) 5%, transparent) 50%,
+      transparent 80%
+    );
+  background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--sans);
   font-size: 16px;
@@ -48,7 +235,7 @@ summary:focus-visible {
   outline-offset: 5px;
 }
 ::selection {
-  background: #f7c4af;
+  background: var(--surface-selection);
   color: var(--ink);
 }
 .wrap {
@@ -102,7 +289,7 @@ h2 {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #55674c;
+  background: var(--sage-marker);
   flex-shrink: 0;
 }
 .orange-dot {
@@ -125,14 +312,25 @@ h2 {
 .skip:focus {
   top: 12px;
 }
+/* The header sits in normal flow directly above .hero (not sticky/fixed), and
+   .hero is the first element in <main>, so the header only ever renders over
+   the dark hero zone -- it needs its own dark-hero background rather than
+   relying on body's --paper showing through behind it (Task 3 of the
+   dark-theme-palette spec). */
 .header {
+  height: 100px;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  border-bottom: 1px solid var(--hero-muted);
+  position: relative;
+  z-index: 10;
+}
+.header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100px;
-  border-bottom: 1px solid var(--line);
+  height: 100%;
   position: relative;
-  z-index: 10;
 }
 .brand {
   display: inline-flex;
@@ -145,7 +343,7 @@ h2 {
   font-weight: 450;
 }
 .brand-dot {
-  color: var(--accent);
+  color: var(--hero-light);
 }
 .brand-mark {
   display: flex;
@@ -158,7 +356,7 @@ h2 {
   display: block;
   width: 25px;
   height: 5px;
-  background: var(--accent);
+  background: var(--hero-light);
 }
 .brand-mark i:nth-child(2) {
   width: 18px;
@@ -169,33 +367,96 @@ h2 {
   font-size: 15px;
   font-weight: 500;
 }
-.header nav a:hover,
+.header nav a:hover {
+  color: var(--hero-light);
+}
 .text-link:hover,
 .footer button:hover {
   color: var(--accent);
 }
 .nav-cta {
   font-size: 14px;
-  border: 1px solid #bfc2b6;
+  border: 1px solid var(--hero-muted);
   border-radius: 5px;
   padding: 12px 17px;
   display: flex;
   gap: 25px;
   align-items: center;
 }
+/* Lighter, not darker, on hover: the same inversion the dark #ai cards use
+   (see the comment above .ai-principles article) -- a raised/active surface
+   on a near-black ground reads as a step toward --hero-ink, not toward
+   --ink, which would nearly vanish against --hero-bg. */
 .nav-cta:hover {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+  background: var(--hero-ink);
+  color: var(--hero-bg);
+  border-color: var(--hero-ink);
 }
 .menu-toggle {
   display: none;
 }
 .hero {
+  position: relative;
+  overflow: clip;
+  background: var(--hero-bg);
+  color: var(--hero-ink);
   padding-top: 53px;
   padding-bottom: 63px;
 }
+/* Dot-matrix texture (Task 3 of the dark-theme-palette spec). CSS-only radial-
+   gradient tile, no image asset, consistent with the CSP's img-src 'self'
+   data: and every other visual on the page. Sits behind the hero's content at
+   z-index: 0; .hero-kicker and .hero-grid are lifted to z-index: 1 below so
+   they paint above it despite being in normal flow (a position: absolute,
+   z-index: 0 pseudo-element otherwise paints above non-positioned siblings in
+   the stacking order, regardless of document order). Opacity is a starting
+   point, like the Task 2 token values -- Task 9's contrast/visual pass is
+   what finalizes it. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at center,
+    var(--hero-texture) 1px,
+    transparent 1.5px
+  );
+  background-size: 20px 20px;
+  opacity: var(--hero-texture-opacity);
+}
+/* Slow ambient atmosphere behind the dot texture. Three soft light clouds drift
+   as one compositor layer; the individual radial gradients fade into the dark
+   hero, so the movement reads as warm smoke rather than hard shapes. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 34% 44% at 18% 24%, var(--hero-atmosphere-coral) 0%, transparent 70%),
+    radial-gradient(ellipse 38% 42% at 82% 30%, var(--hero-atmosphere-gold) 0%, transparent 72%),
+    radial-gradient(ellipse 42% 36% at 56% 82%, var(--hero-atmosphere-sage) 0%, transparent 74%);
+  opacity: var(--hero-atmosphere-opacity);
+  filter: blur(48px) saturate(1.12);
+  transform: translate3d(-2%, -1%, 0) scale(1.02);
+  transform-origin: center;
+  will-change: transform;
+  animation: hero-atmosphere-drift 24s ease-in-out infinite alternate;
+}
+@keyframes hero-atmosphere-drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1.02) rotate(-1deg);
+  }
+  to {
+    transform: translate3d(2%, 2%, 0) scale(1.08) rotate(1deg);
+  }
+}
 .hero-kicker {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -206,16 +467,18 @@ h2 {
 .hero-kicker > span:last-child {
   letter-spacing: 0;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--hero-muted);
   font-weight: 400;
 }
 .kicker-rule {
   width: 26px;
   height: 1px;
-  background: #bfc2b6;
+  background: var(--hero-muted);
   margin: 0 3px;
 }
 .hero-grid {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   gap: 38px;
@@ -230,7 +493,7 @@ h1 {
   margin-bottom: 27px;
 }
 h1 .serif {
-  color: var(--accent);
+  color: var(--hero-light);
   letter-spacing: -3px;
 }
 .hero-description {
@@ -239,9 +502,11 @@ h1 .serif {
   letter-spacing: -0.3px;
   margin-bottom: 16px;
 }
+/* Hero detail remains part of the live hero copy alongside the vignette. The
+   dark-hero token keeps this supporting description legible. */
 .hero-detail {
   max-width: 445px;
-  color: var(--muted);
+  color: var(--hero-muted);
   font-size: 15px;
   line-height: 1.8;
   margin-bottom: 28px;
@@ -270,7 +535,7 @@ h1 .serif {
   color: white;
 }
 .button-dark:hover {
-  background: #42483a;
+  background: var(--button-dark-hover);
   transform: translateY(-2px);
 }
 .text-link {
@@ -280,50 +545,23 @@ h1 .serif {
   align-items: center;
   min-height: 44px;
 }
+/* The footnote remains live copy beside the vignette and uses the light hero
+   accent for its decorative marker. */
 .hero-footnote {
   display: flex;
   gap: 9px;
   align-items: center;
   margin-top: 31px;
-  color: var(--muted);
+  color: var(--hero-muted);
   font-size: 12px;
 }
 .tiny-cross {
-  color: var(--accent);
+  color: var(--hero-light);
   font-size: 18px;
-}
-.hero-visual {
-  height: 420px;
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse at 52% 52%, #e1e1d3 0, transparent 55%), #efeee6;
-  border: 1px solid #e6e5dc;
-  border-radius: 6px;
-}
-.visual-top,
-.visual-bottom {
-  position: absolute;
-  left: 23px;
-  right: 23px;
-  display: flex;
-  justify-content: space-between;
-  color: #737569;
-}
-.visual-top {
-  top: 22px;
-}
-.visual-top .micro {
-  font-size: 10px;
-}
-.visual-bottom {
-  bottom: 20px;
-  font-size: 9px;
-  letter-spacing: 1.8px;
 }
 .orbit {
   position: absolute;
-  border: 1px solid #d2d4c6;
+  border: 1px solid var(--orbit-line);
   border-radius: 50%;
   left: 50%;
   top: 47%;
@@ -353,7 +591,7 @@ h1 .serif {
   height: 8px;
   border: 3px solid var(--paper);
   border-radius: 50%;
-  background: #8e9885;
+  background: var(--orbit-inner-marker);
   box-sizing: content-box;
 }
 /* Ambient drift. Only the marked rings are animated: a uniform circle looks
@@ -376,7 +614,7 @@ h1 .serif {
   height: 6px;
   border: 3px solid var(--paper);
   border-radius: 50%;
-  background: #a3ab98;
+  background: var(--orbit-outer-marker);
   box-sizing: content-box;
 }
 @keyframes orbit-drift {
@@ -394,232 +632,6 @@ h1 .serif {
   to {
     transform: rotate(-387deg);
   }
-}
-/* Was a dashed border, then a repeating gradient scrolled with
-   background-position. background-position is not a compositor property, so
-   every frame of that version went through layout and paint on the main thread
-   and Lighthouse counted it as a non-composited animation.
-
-   Same picture, driven by transform instead. The track keeps the geometry and
-   becomes a clip; the gradient moves to a pseudo-element that overhangs the
-   track by one dash period at the top and two at the bottom, and travels down
-   exactly one period per cycle.
-
-   Why one period, and why the overhang is what it is: the dash pattern repeats
-   every 7px, so starting the gradient 7px above the track puts the same dash
-   phase at the top of the track as background-position: 0 0 did, and finishing
-   7px lower lands the next dash exactly where the first one started. The loop
-   is seamless and the two end states match the old keyframes pixel for pixel.
-
-   The `background-size: 1px 7px` that used to be here was redundant: the
-   gradient's own period is already 7px, so tiling it at 7px and letting it
-   repeat intrinsically draw the same dashes. */
-.signal-line {
-  position: absolute;
-  left: 50%;
-  top: 80px;
-  height: 208px;
-  width: 1px;
-  overflow: hidden;
-}
-.signal-line::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -7px;
-  width: 1px;
-  /* One period of overhang above, two below: 7px of travel plus 7px of spare,
-     so the bottom of the track is still covered at the end of the cycle. The
-     percentage keeps this correct where the media queries shorten the track. */
-  height: calc(100% + 14px);
-  background: repeating-linear-gradient(#a9ae9c 0 3px, transparent 3px 7px);
-  animation: signal-flow 7s linear infinite;
-}
-@keyframes signal-flow {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(7px);
-  }
-}
-.handoff-label {
-  position: absolute;
-  top: 76px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #efeee6;
-  padding: 8px 11px;
-  font-size: 10px;
-  white-space: nowrap;
-  letter-spacing: 1px;
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  color: #6b705f;
-}
-.signal-core {
-  position: absolute;
-  left: 50%;
-  top: 46%;
-  /* Centring lives on translate so the float keyframes own transform and the
-     hover state owns scale. Three properties, no fighting over one. */
-  translate: -50% -50%;
-  transform: rotate(-8deg);
-  height: 90px;
-  width: 90px;
-  background: linear-gradient(145deg, #fc8155, #df4b26);
-  border: 1px solid #d94d2a;
-  border-radius: 22px;
-  /* Only the inset highlight stays on the element. It was identical in both
-     keyframes of the float, so it was never being animated in the first place;
-     the drop shadow that was is now two cross-fading layers below. */
-  box-shadow: inset 0 2px 1px #ffac85;
-  display: grid;
-  place-items: center;
-  animation: core-float 7s ease-in-out infinite alternate;
-  transition:
-    scale 240ms ease-out,
-    box-shadow 240ms ease-out;
-}
-/* box-shadow is not a compositor property, so the old version of this
-   animation, which grew the drop shadow alongside the lift, ran on the main
-   thread. Lighthouse counted it as the second non-composited animation.
-   transform only now. */
-@keyframes core-float {
-  from {
-    transform: rotate(-8deg) translateY(0);
-  }
-  to {
-    transform: rotate(-8deg) translateY(-6px);
-  }
-}
-/* The breathing shadow, as two fixed layers cross-fading on the same clock as
-   the lift: the same trick as .steps article::before and
-   .ai-principles article::before, which sit at opacity 0 and come up to 1.
-   opacity is compositable, box-shadow is not.
-   Both are inset: -1px so their border box lines up with the core's own border
-   box, which is where the shadow was cast from before, and border-radius:
-   inherit then gives them the same 22px corner. */
-.signal-core:before,
-.signal-core:after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  pointer-events: none;
-}
-/* Resting: the shadow the core sits in at the bottom of the breath. Fades out
-   as it rises. */
-.signal-core:before {
-  box-shadow: 0 16px 28px #8e694330;
-  animation: core-shadow-rest 7s ease-in-out infinite alternate;
-}
-/* Lifted: further down, softer, fainter. Fades in as it rises. */
-.signal-core:after {
-  box-shadow: 0 22px 36px #8e694326;
-  opacity: 0;
-  animation: core-shadow-lift 7s ease-in-out infinite alternate;
-}
-@keyframes core-shadow-rest {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-@keyframes core-shadow-lift {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-/* Hover deepens the shadow on top of whichever float layer is showing, which is
-   what the old :after layer did by sitting at alpha 00 and coming up to 38. It
-   can live on the element's own box-shadow now: the float animation no longer
-   touches that property, so there is nothing left to collide with, and both
-   pseudo-elements are carrying the float. */
-.signal-core:hover {
-  scale: 1.05;
-  box-shadow:
-    inset 0 2px 1px #ffac85,
-    0 26px 44px #8e694338;
-}
-.core-symbol {
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 89px;
-  line-height: 1;
-  color: #fff8e8;
-  transform: translateY(-8px);
-  transition:
-    rotate 240ms ease-out,
-    scale 240ms ease-out;
-}
-.signal-core:hover .core-symbol {
-  rotate: -6deg;
-  scale: 1.06;
-}
-.signal-note {
-  position: absolute;
-  top: 260px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  font-size: 13px;
-  background: #eeeee5;
-  padding: 5px 8px;
-}
-.action-slip {
-  position: absolute;
-  bottom: 49px;
-  left: 24px;
-  right: 24px;
-  background: #fffefa;
-  border: 1px solid #dbddd0;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 16px 14px;
-  box-shadow: 0 8px 20px #333b2010;
-  transition:
-    transform 240ms ease-out,
-    box-shadow 240ms ease-out;
-}
-.action-slip:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 26px #333b2018;
-}
-.slip-check {
-  border: 1px solid #ccd3be;
-  background: #eff2e9;
-  color: #536e43;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-}
-.action-slip .micro {
-  font-size: 9px;
-  color: var(--muted);
-}
-.action-slip strong {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  margin-top: 5px;
-}
-.slip-arrow {
-  margin-left: auto;
-  font-size: 18px;
 }
 .principle-strip {
   border-block: 1px solid var(--line);
@@ -640,7 +652,7 @@ h1 .serif {
   font-family: monospace;
   font-size: 11px;
   font-weight: 400;
-  color: #74796b;
+  color: var(--strip-label);
   margin-right: 10px;
 }
 .section {
@@ -674,10 +686,10 @@ h1 .serif {
   padding: 28px 33px 20px;
 }
 .activity-side {
-  background: #efeee8;
+  background: var(--surface-contrast-activity);
 }
 .clarity-side {
-  background: #faf9f4;
+  background: var(--surface-quiet);
   border-left: 1px solid var(--line);
 }
 .panel-label {
@@ -693,7 +705,7 @@ h1 .serif {
   align-items: center;
   gap: 10px;
   min-height: 44px;
-  border-bottom: 1px solid #e1e1d7;
+  border-bottom: 1px solid var(--contrast-divider);
 }
 .message-line p {
   font-size: 14px;
@@ -706,7 +718,7 @@ h1 .serif {
   letter-spacing: 0.8px;
 }
 .message-icon {
-  color: #8d9183;
+  color: var(--message-icon);
 }
 .contrast-caption {
   margin: 20px 0 0;
@@ -722,7 +734,7 @@ h1 .serif {
   gap: 15px;
   min-height: 44px;
   align-items: center;
-  border-bottom: 1px solid #e1e1d7;
+  border-bottom: 1px solid var(--contrast-divider);
   font-size: 14px;
 }
 .clarity-side dt {
@@ -734,12 +746,12 @@ h1 .serif {
   text-align: right;
 }
 .attention-text {
-  color: #a74224;
+  color: var(--attention);
 }
 .preview-section {
-  background: #e9ece3;
+  background: var(--surface-preview);
   padding: 80px 0 54px;
-  border-block: 1px solid #dadecf;
+  border-block: 1px solid var(--preview-border);
 }
 .preview-heading {
   display: flex;
@@ -754,7 +766,7 @@ h1 .serif {
 .preview-heading > p {
   font-size: 14px;
   max-width: 370px;
-  color: #5a6152;
+  color: var(--preview-heading-copy);
   margin-bottom: 4px;
 }
 .preview-disclaimer {
@@ -764,14 +776,14 @@ h1 .serif {
 }
 .workspace {
   background: var(--white);
-  border: 1px solid #ccd2c2;
+  border: 1px solid var(--workspace-border);
   border-radius: 7px;
-  box-shadow: 0 18px 42px #3e493c12;
+  box-shadow: 0 18px 42px var(--sage-shadow-soft);
   overflow: hidden;
 }
 .workspace-top {
   height: 57px;
-  border-bottom: 1px solid #e3e6db;
+  border-bottom: 1px solid var(--workspace-subdivider);
   padding: 0 25px;
   display: flex;
   justify-content: space-between;
@@ -785,7 +797,7 @@ h1 .serif {
   font-weight: 500;
 }
 .workspace-brand > span:not(.mini-mark) {
-  color: #989e8c;
+  color: var(--workspace-brand-copy);
 }
 .mini-mark {
   display: grid;
@@ -803,10 +815,10 @@ h1 .serif {
 .prototype-pill {
   font-size: 10px;
   letter-spacing: 1px;
-  border: 1px solid #daddd2;
+  border: 1px solid var(--prototype-border);
   padding: 5px 8px;
   border-radius: 3px;
-  color: #686e5f;
+  color: var(--workspace-pill-copy);
 }
 .workspace-body {
   display: grid;
@@ -814,8 +826,8 @@ h1 .serif {
   min-height: 414px;
 }
 .case-sidebar {
-  background: #f7f8f3;
-  border-right: 1px solid #e1e5d8;
+  background: var(--surface-workspace-muted);
+  border-right: 1px solid var(--workspace-divider);
   padding: 23px 15px;
   display: flex;
   flex-direction: column;
@@ -823,7 +835,7 @@ h1 .serif {
 }
 .case-sidebar > p {
   font-size: 10px;
-  color: #676d5c;
+  color: var(--case-sidebar-copy);
   margin: 0 10px 12px;
   display: flex;
   justify-content: space-between;
@@ -840,12 +852,12 @@ h1 .serif {
   width: 100%;
 }
 .case-button:hover {
-  background: #eeefe7;
+  background: var(--surface-workspace-hover);
 }
 .case-button.active {
   background: white;
-  border-color: #cbd2c0;
-  box-shadow: 0 2px 4px #333b2008;
+  border-color: var(--workspace-active-border);
+  box-shadow: 0 2px 4px var(--card-shadow-soft);
 }
 .case-button-top {
   display: flex;
@@ -853,7 +865,7 @@ h1 .serif {
   align-items: center;
   gap: 10px;
   font-size: 11px;
-  color: #606858;
+  color: var(--case-button-meta);
 }
 .case-state {
   font-size: 10px;
@@ -862,16 +874,16 @@ h1 .serif {
   font-weight: 500;
 }
 .amber {
-  background: #fff0d9;
-  color: #825418;
+  background: var(--surface-case-amber);
+  color: var(--case-amber-text);
 }
 .blue {
-  background: #e9eff4;
-  color: #466177;
+  background: var(--surface-case-blue);
+  color: var(--case-blue-text);
 }
 .green {
-  background: #e6eddf;
-  color: #48623b;
+  background: var(--case-green-bg);
+  color: var(--sage-success);
 }
 .case-button strong {
   display: block;
@@ -881,14 +893,14 @@ h1 .serif {
 }
 .case-sub {
   font-size: 11px;
-  color: #6e7366;
+  color: var(--case-sub-copy);
 }
 .sidebar-bottom {
   display: flex;
   gap: 7px;
   align-items: center;
   font-size: 11px;
-  color: #707566;
+  color: var(--sidebar-copy);
   margin: auto 10px 0;
   padding-top: 22px;
 }
@@ -900,7 +912,7 @@ h1 .serif {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: #68705f;
+  color: var(--workspace-breadcrumb);
   margin-bottom: 22px;
 }
 .case-breadcrumb span:first-child {
@@ -914,7 +926,7 @@ h1 .serif {
 }
 .case-detail > p {
   font-size: 13px;
-  color: #686e60;
+  color: var(--case-detail-copy);
   max-width: 490px;
   min-height: 40px;
   margin-bottom: 24px;
@@ -922,7 +934,7 @@ h1 .serif {
 .case-metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  border-top: 1px solid #e5e7dd;
+  border-top: 1px solid var(--metrics-divider);
   padding-top: 18px;
   margin-bottom: 24px;
   gap: 10px;
@@ -930,7 +942,7 @@ h1 .serif {
 .case-metrics span {
   display: block;
   font-size: 10px;
-  color: #666e5e;
+  color: var(--workspace-metric);
   letter-spacing: 1px;
   margin-bottom: 8px;
 }
@@ -939,8 +951,8 @@ h1 .serif {
   font-weight: 500;
 }
 .ai-insight {
-  border-left: 2px solid #bdcaa9;
-  background: #f2f5ed;
+  border-left: 2px solid var(--insight-border);
+  background: var(--surface-insight);
   padding: 17px 19px;
 }
 .insight-heading {
@@ -955,22 +967,22 @@ h1 .serif {
   font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.6px;
-  color: #656f5a;
+  color: var(--insight-meta);
 }
 .spark {
-  color: #506638;
+  color: var(--sage-spark);
   font-size: 15px;
 }
 .ai-insight p {
   font-size: 13px;
-  color: #5b6650;
+  color: var(--insight-copy);
   margin: 10px 0 4px;
   min-height: 38px;
 }
 .source-button {
   background: none;
   border: 0;
-  border-bottom: 1px solid #aab797;
+  border-bottom: 1px solid var(--source-border);
   padding: 8px 0;
   font-size: 11px;
   display: inline-flex;
@@ -979,23 +991,23 @@ h1 .serif {
   min-height: 32px;
 }
 .source-button:hover {
-  color: #30571a;
+  color: var(--workspace-source-hover);
 }
 .human-review {
   font-size: 11px;
-  color: #68705f;
+  color: var(--workspace-breadcrumb);
   margin-top: 16px;
   display: flex;
   gap: 8px;
 }
 .workspace-footer {
-  border-top: 1px solid #e1e5d8;
+  border-top: 1px solid var(--workspace-divider);
   display: flex;
   justify-content: space-between;
   gap: 20px;
   padding: 13px 25px;
   font-size: 10px;
-  color: #666e5e;
+  color: var(--workspace-metric);
 }
 .workspace-footer > span:first-child {
   display: flex;
@@ -1004,7 +1016,7 @@ h1 .serif {
 }
 .preview-caption {
   text-align: center;
-  color: #5b6553;
+  color: var(--preview-caption);
   font-size: 12px;
   margin: 22px 0 0;
 }
@@ -1020,7 +1032,7 @@ h1 .serif {
    was, with the single exception noted at .steps p below.
 
    The shade runs light at the top to dark at the bottom, and the original
-   #bec4b3 rule is kept as border-top-color so it is still the strongest line
+   var(--workflow-rail) rule is kept as border-top-color so it is still the strongest line
    on the card and the section still reads the way it did.
 
    The hover shade lives on ::before rather than on this element, because a
@@ -1040,14 +1052,14 @@ h1 .serif {
   /* So the z-index: -1 on ::before is trapped here and cannot paint behind the
      section. position: relative alone does not open a stacking context. */
   isolation: isolate;
-  border: 1px solid #d7d5c6;
-  border-top-color: #bec4b3;
+  border: 1px solid var(--workflow-border);
+  border-top-color: var(--workflow-rail);
   border-radius: 7px;
-  background-color: #eeece4;
-  background-image: linear-gradient(180deg, #eeece4 0%, #e0dfd5 100%);
+  background-color: var(--surface-workflow-top);
+  background-image: linear-gradient(180deg, var(--surface-workflow-top) 0%, var(--workflow-surface-bottom) 100%);
   box-shadow:
-    0 1px 2px #333b200a,
-    0 6px 18px #333b200d;
+    0 1px 2px var(--card-shadow-small),
+    0 6px 18px var(--card-shadow-medium);
   padding: 23px 22px 24px;
   transition:
     transform 240ms ease-out,
@@ -1062,7 +1074,7 @@ h1 .serif {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background-image: linear-gradient(180deg, #f2f0e9 0%, #e6e4da 100%);
+  background-image: linear-gradient(180deg, var(--surface-workflow-hover-top) 0%, var(--workflow-hover-bottom) 100%);
   opacity: 0;
   transition: opacity 240ms ease-out;
 }
@@ -1072,11 +1084,11 @@ h1 .serif {
 @media (hover: hover) {
   .steps article:hover {
     transform: translateY(-3px);
-    border-color: #c8c6b5;
-    border-top-color: #aeb59f;
+    border-color: var(--workflow-hover-border);
+    border-top-color: var(--workflow-hover-rail);
     box-shadow:
-      0 2px 4px #333b2010,
-      0 14px 30px #333b2014;
+      0 2px 4px var(--card-shadow-hover-small),
+      0 14px 30px var(--card-shadow-hover-large);
   }
   .steps article:hover::before {
     opacity: 1;
@@ -1090,11 +1102,11 @@ h1 .serif {
    cannot fire yet; it is here so a link added later is covered by default. */
 .steps article:focus-within {
   transform: translateY(-3px);
-  border-color: #c8c6b5;
-  border-top-color: #aeb59f;
+  border-color: var(--workflow-hover-border);
+  border-top-color: var(--workflow-hover-rail);
   box-shadow:
-    0 2px 4px #333b2010,
-    0 14px 30px #333b2014;
+    0 2px 4px var(--card-shadow-hover-small),
+    0 14px 30px var(--card-shadow-hover-large);
 }
 .steps article:focus-within::before {
   opacity: 1;
@@ -1120,7 +1132,7 @@ h1 .serif {
   justify-content: space-between;
   font-family: var(--serif);
   font-size: 30px;
-  color: #68725b;
+  color: var(--step-number);
   /* Was 30px, when this row sat directly above the h3. The icon now follows it
      and carries its own gap, so the number and the mark read as one group. */
   margin-bottom: 18px;
@@ -1141,16 +1153,16 @@ h1 .serif {
 }
 .steps p {
   font-size: 14px;
-  /* Not --muted. #686a60 is 4.96:1 on --paper but only 4.11:1 on the dark end
-     of the card shade, which fails AA for 14px. #5d5f55 is the same hue two
+  /* Not --muted. var(--muted) is 4.96:1 on --paper but only 4.11:1 on the dark end
+     of the card shade, which fails AA for 14px. var(--step-copy) is the same hue two
      steps down and clears it at 4.85:1 there, 5.79:1 on the light end. It is
      the only colour in this section the card forced a change to. */
-  color: #5d5f55;
+  color: var(--step-copy);
   margin-bottom: 28px;
 }
 .step-tag {
   font-size: 10px;
-  color: #707667;
+  color: var(--step-tag);
   letter-spacing: 1.1px;
 }
 /* Section icons -------------------------------------------------------------
@@ -1201,12 +1213,12 @@ h1 .serif {
   stroke: none;
 }
 .steps .section-icon {
-  color: #68725b;
+  color: var(--step-number);
   margin-bottom: 20px;
 }
 .ai-section {
-  background: #282d25;
-  color: #f5f3e9;
+  background: var(--ai-bg);
+  color: var(--ai-ink);
   padding: 84px 0;
 }
 .ai-grid {
@@ -1215,20 +1227,20 @@ h1 .serif {
   gap: 85px;
 }
 .ai-section .eyebrow {
-  color: #c0c8b6;
+  color: var(--ai-eyebrow);
   margin-bottom: 35px;
 }
 .ai-section .eyebrow > span:first-child {
-  color: #bcc6ae;
+  color: var(--ai-eyebrow-marker);
 }
 .ai-section h2 {
   font-size: 49px;
 }
 .ai-section .serif {
-  color: #c7d3b6;
+  color: var(--ai-serif);
 }
 .ai-intro {
-  color: #c0c7b6;
+  color: var(--ai-muted);
   font-size: 15px;
   margin: 25px 0 33px;
 }
@@ -1237,7 +1249,7 @@ h1 .serif {
   gap: 8px;
   align-items: center;
   font-size: 11px;
-  color: #c1c7b8;
+  color: var(--ai-development);
 }
 /* Principle cards ----------------------------------------------------------
    The same container-and-motion change as the workflow cards above, on the
@@ -1250,13 +1262,13 @@ h1 .serif {
 
    Three things invert here, because the section is dark:
 
-   1. Elevation reads lighter, not darker. A raised surface on #282d25 is a
+   1. Elevation reads lighter, not darker. A raised surface on var(--ai-bg) is a
       lighter surface, so the shade sits *above* the section rather than below
       it the way the workflow card sits below --paper. The gradient still runs
       light at the top to dark at the bottom, so the light is still coming from
       above; it is only the step relative to the section that flips.
 
-   2. The shadow is no longer the lift signal. Black on #282d25 is very nearly
+   2. The shadow is no longer the lift signal. Black on var(--ai-bg) is very nearly
       invisible, so the elevation is carried by the background step and by the
       border, and the shadow is kept to a narrow contact shade that only reads
       because the card above it is lighter than the section. It supports the
@@ -1267,7 +1279,7 @@ h1 .serif {
       worst case and a lighter hover could only improve it. Here lightening
       costs contrast, so hover is the worst case — and it is still affordable,
       because light-on-dark leaves this section far more headroom than the
-      workflow card had: the dimmest ink in the card, the #b8c4a5 marker, is
+      workflow card had: the dimmest ink in the card, the AI marker token, is
       6.11:1 at the very lightest point of the hover shade against a 4.5
       requirement. The one value that is genuinely close to a floor is the
       decorative --orange in the icons, 4.27:1 on the bare section against the
@@ -1281,16 +1293,16 @@ h1 .serif {
   /* So the z-index: -1 on ::before is trapped here and cannot paint behind the
      section. position: relative alone does not open a stacking context. */
   isolation: isolate;
-  /* The original 1px #505747 rule is kept as border-top-color, so it is still
+  /* The original 1px var(--ai-card-rail) rule is kept as border-top-color, so it is still
      the brightest line on the card and the rail still reads the way it did. */
-  border: 1px solid #3f4739;
-  border-top-color: #505747;
+  border: 1px solid var(--ai-card-border);
+  border-top-color: var(--ai-card-rail);
   border-radius: 7px;
-  background-color: #31372e;
-  background-image: linear-gradient(180deg, #31372e 0%, #2c322a 100%);
+  background-color: var(--ai-card-top);
+  background-image: linear-gradient(180deg, var(--ai-card-top) 0%, var(--ai-card-bottom) 100%);
   box-shadow:
-    0 1px 2px #0e120b40,
-    0 6px 16px #0e120b33;
+    0 1px 2px var(--ai-shadow-soft),
+    0 6px 16px var(--ai-shadow-deep);
   /* padding-top was already 25px, under the rule. Kept, so the marker and the
      icon sit exactly where they sat; the sides and the bottom are new. */
   padding: 25px 22px 24px;
@@ -1310,7 +1322,7 @@ h1 .serif {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background-image: linear-gradient(180deg, #373d33 0%, #31372e 100%);
+  background-image: linear-gradient(180deg, var(--ai-card-hover-top) 0%, var(--ai-card-top) 100%);
   opacity: 0;
   transition: opacity 240ms ease-out;
 }
@@ -1325,11 +1337,11 @@ h1 .serif {
     transform: translateY(-3px);
     /* Brighter, not darker. On the light card hover pushed the border down to
        make it more present; the equivalent move on a dark card is up. */
-    border-color: #4c5445;
-    border-top-color: #626b57;
+    border-color: var(--deep-sage);
+    border-top-color: var(--ai-card-hover-rail);
     box-shadow:
-      0 2px 4px #0e120b4d,
-      0 14px 28px #0e120b40;
+      0 2px 4px var(--ai-shadow-hover),
+      0 14px 28px var(--ai-shadow-soft);
   }
   .ai-principles article:hover::before {
     opacity: 1;
@@ -1343,11 +1355,11 @@ h1 .serif {
    cannot fire yet; it is here so a link added later is covered by default. */
 .ai-principles article:focus-within {
   transform: translateY(-3px);
-  border-color: #4c5445;
-  border-top-color: #626b57;
+  border-color: var(--deep-sage);
+  border-top-color: var(--ai-card-hover-rail);
   box-shadow:
-    0 2px 4px #0e120b4d,
-    0 14px 28px #0e120b40;
+    0 2px 4px var(--ai-shadow-hover),
+    0 14px 28px var(--ai-shadow-soft);
 }
 .ai-principles article:focus-within::before {
   opacity: 1;
@@ -1376,7 +1388,7 @@ h1 .serif {
   --glyph-shift: translate(2px, -2px);
 }
 .ai-principles article > span {
-  color: #b8c4a5;
+  color: var(--ai-marker);
   font-family: monospace;
   font-size: 12px;
   white-space: nowrap;
@@ -1389,7 +1401,7 @@ h1 .serif {
    marker's own ink so the rail and the mark read as one column. */
 .ai-principles .section-icon {
   --icon-accent: var(--orange);
-  color: #c6cebb;
+  color: var(--ai-icon);
   margin-bottom: 14px;
   /* Kept on transform only: the icon must not change the text column's height
      or the h3 and the paragraph under it would move as well. Scoped to
@@ -1403,7 +1415,7 @@ h1 .serif {
   letter-spacing: -0.2px;
 }
 .ai-principles p {
-  color: #c0c7b6;
+  color: var(--ai-muted);
   font-size: 14px;
   margin-bottom: 0;
 }
@@ -1438,7 +1450,7 @@ summary::-webkit-details-marker {
 summary > span {
   font-size: 20px;
   font-weight: 400;
-  color: #79816d;
+  color: var(--faq-marker);
 }
 details[open] summary > span {
   transform: rotate(45deg);
@@ -1450,8 +1462,8 @@ details p {
   margin-bottom: 23px;
 }
 .access-section {
-  background: #e8eadd;
-  border: 1px solid #d8dccb;
+  background: var(--access-surface);
+  border: 1px solid var(--access-border);
   padding: 35px 44px 44px;
   border-radius: 5px;
 }
@@ -1466,7 +1478,7 @@ details p {
 }
 .access-stage {
   font-size: 11px;
-  color: #626c54;
+  color: var(--access-stage);
 }
 .access-grid {
   display: grid;
@@ -1480,16 +1492,16 @@ details p {
 }
 .access-grid > div > p {
   font-size: 14px;
-  color: #5d6652;
+  color: var(--access-copy);
   margin-bottom: 0;
 }
 .access-note {
-  border-left: 1px solid #c5cdb8;
+  border-left: 1px solid var(--access-divider);
   padding-left: 37px;
 }
 .access-note .micro {
   font-size: 10px;
-  color: #657057;
+  color: var(--access-micro);
 }
 .access-note h3 {
   font-size: 23px;
@@ -1501,11 +1513,11 @@ details p {
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 5px;
-  color: #435039;
+  color: var(--access-note-text);
 }
 .access-note .access-small {
   font-size: 12px;
-  color: #647057;
+  color: var(--access-small);
   margin-bottom: 10px;
 }
 .footer {
@@ -1529,7 +1541,7 @@ details p {
 }
 .footer-meta {
   text-align: right;
-  color: #6a7160;
+  color: var(--footer-meta);
   font-size: 11px;
 }
 .footer-meta > div {
@@ -1556,10 +1568,10 @@ dialog {
   background: var(--paper);
   color: var(--ink);
   max-height: 85vh;
-  box-shadow: 0 30px 100px #0003;
+  box-shadow: 0 30px 100px var(--dialog-shadow);
 }
 dialog::backdrop {
-  background: #25282099;
+  background: var(--dialog-backdrop);
   backdrop-filter: blur(4px);
 }
 .dialog-top {
@@ -1581,7 +1593,7 @@ dialog::backdrop {
   font-size: 24px;
 }
 .dialog-close:hover {
-  background: #e8e9de;
+  background: var(--dialog-hover);
 }
 dialog h2 {
   font-size: 34px;
@@ -1589,7 +1601,7 @@ dialog h2 {
 }
 dialog p {
   font-size: 15px;
-  color: #565d4d;
+  color: var(--dialog-copy);
 }
 dialog p:last-child {
   margin-bottom: 0;
@@ -1600,9 +1612,6 @@ dialog p:last-child {
   }
   .hero-grid {
     gap: 65px;
-  }
-  .hero-visual {
-    height: 445px;
   }
   .hero h1 {
     font-size: 88px;
@@ -1631,9 +1640,6 @@ dialog p:last-child {
   }
   .hero-actions .text-link {
     font-size: 12px;
-  }
-  .hero-visual {
-    height: 405px;
   }
   .strip-inner {
     font-size: 12px;
@@ -1700,26 +1706,10 @@ dialog p:last-child {
   .hero-detail {
     max-width: 490px;
   }
-  .hero-visual {
-    height: 370px;
+  .a-visual {
     max-width: 550px;
     width: 100%;
     justify-self: center;
-  }
-  .signal-core {
-    top: 44%;
-  }
-  .signal-note {
-    top: 224px;
-  }
-  .signal-line {
-    height: 172px;
-  }
-  .handoff-label {
-    top: 57px;
-  }
-  .visual-top {
-    top: 16px;
   }
   .hero-actions .text-link {
     font-size: 14px;
@@ -1859,7 +1849,7 @@ dialog p:last-child {
   }
   .access-note {
     border-left: 0;
-    border-top: 1px solid #c5cdb8;
+    border-top: 1px solid var(--access-divider);
     padding: 24px 0 0;
   }
   .access-note h3 br {
@@ -1901,7 +1891,7 @@ dialog p:last-child {
   .menu-toggle span {
     width: 20px;
     height: 1px;
-    background: var(--ink);
+    background: var(--hero-ink);
     margin-inline: auto;
   }
   .header nav {
@@ -1911,9 +1901,9 @@ dialog p:last-child {
     left: -20px;
     right: -20px;
     padding: 20px;
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 12px 15px #25282008;
+    background: var(--hero-bg);
+    border-bottom: 1px solid var(--hero-muted);
+    box-shadow: 0 12px 15px var(--ink-shadow-soft);
     font-size: 15px;
   }
   .header nav.open {
@@ -1979,42 +1969,9 @@ dialog p:last-child {
     font-size: 11px;
     margin-top: 19px;
   }
-  .hero-visual {
-    height: 350px;
-  }
-  .signal-note {
-    top: 213px;
-    font-size: 12px;
-  }
-  .action-slip {
-    bottom: 42px;
-    left: 16px;
-    right: 16px;
-    padding: 12px;
-  }
-  .visual-top,
-  .visual-bottom {
-    left: 16px;
-    right: 16px;
-  }
-  .visual-top .micro {
-    font-size: 9px;
-  }
   .orbit-three {
     width: 390px;
     height: 390px;
-  }
-  .signal-core {
-    height: 80px;
-    width: 80px;
-    border-radius: 19px;
-  }
-  .core-symbol {
-    font-size: 79px;
-  }
-  .visual-bottom {
-    bottom: 17px;
-    font-size: 8px;
   }
   .strip-inner {
     column-gap: 10px;
@@ -2250,13 +2207,12 @@ dialog p:last-child {
     font-size: 29px;
   }
 }
-.handoff-label,
 .strip-inner b,
 .sidebar-bottom,
 .step-tag,
 .access-note .micro,
 .access-note .access-small {
-  color: #59624e;
+  color: var(--secondary-muted);
 }
 /* Below 540px both ring radii cross the hero micro-label rows, so a travelling
    marker can read as a stray dot between them. Park the rings at their base
@@ -2277,36 +2233,45 @@ dialog p:last-child {
     transition: none !important;
     animation: none !important;
   }
-  /* Named explicitly as well as caught by the wildcard above, so the hero
-     visual's motion is auditable selector by selector. Hover states drop
-     their movement here and keep only the shadow as the affordance. */
-  .orbit-two,
-  .orbit-three,
-  .signal-line,
-  /* The dashed flow moved off the track's own background-position and onto this
-     pseudo-element's transform, so this is the selector that now has to be
-     named for the hero to be auditable line by line. */
-  .signal-line::before,
-  .signal-core,
-  /* Two shadow layers now instead of one. Stopping their animations leaves
-     ::before at opacity 1 and ::after at opacity 0, which is exactly the
-     resting shadow the core used to carry statically. */
-  .signal-core:before,
-  .signal-core:after,
-  .core-symbol,
-  .action-slip {
+  /* The ambient hero atmosphere is complete while static; reduced motion
+     stops its drift but keeps the warm light field visible. */
+  .hero::after {
     animation: none;
     transition: none;
   }
-  .signal-core:hover {
-    scale: 1;
+  /* The Direction A vignette uses a resolved base style, so disabling its
+     animation leaves the finished case visible instead of frame zero. These
+     selectors are listed explicitly for the same auditability as the older
+     hero animation block above. */
+  .a-visual .orbit-two,
+  .a-visual .orbit-three,
+  .a-visual .a-msg-in,
+  .a-visual .a-s0,
+  .a-visual .a-s1,
+  .a-visual .a-s2,
+  .a-visual .a-sweep-band,
+  .a-visual .a-src::before,
+  .a-visual .a-ref,
+  .a-visual .a-was,
+  .a-visual .a-now,
+  .a-visual .a-field::before,
+  .a-visual .a-review-in,
+  .a-visual .a-chip,
+  .a-visual .a-veil,
+  .a-visual .a-progress > span {
+    animation: none;
+    transition: none;
   }
-  .signal-core:hover .core-symbol {
-    rotate: 0deg;
-    scale: 1;
-  }
-  .action-slip:hover {
+  .motion-toggle,
+  .motion-toggle:hover {
+    transition: none;
     transform: none;
+  }
+  .a-progress {
+    visibility: hidden;
+  }
+  .motion-toggle {
+    visibility: hidden;
   }
   /* Workflow cards, same rule as above: named as well as caught by the
      wildcard, and both gestures give up their movement. The shade cross-fade,
@@ -2350,7 +2315,7 @@ dialog p:last-child {
   font-weight: 500;
   line-height: 1.6;
   letter-spacing: -0.1px;
-  color: #4c5445;
+  color: var(--hero-ink);
   margin-bottom: 18px;
 }
 .h2-clause {
@@ -2363,24 +2328,27 @@ dialog p:last-child {
   font-weight: 500;
   line-height: 1.55;
   letter-spacing: -0.1px;
-  color: #565f4d;
+  color: var(--hero-clause);
 }
 .workspace-notice {
   margin: 0;
   padding: 9px 25px;
-  border-bottom: 1px solid #e3e6db;
-  background: #f7f8f3;
-  color: #59624e;
+  border-bottom: 1px solid var(--workspace-subdivider);
+  background: var(--surface-workspace-muted);
+  color: var(--secondary-muted);
   font-size: 11px;
   letter-spacing: 0.6px;
   line-height: 1.6;
 }
 .header nav a[aria-current="true"] {
-  /* Not --accent. At 15px on --paper the accent is 3.84:1, which fails AA, and
-     this is a persistent state rather than a hover, so axe catches it as soon
-     as the page is scrolled far enough for a section to become current.
-     #a83a1c is the same hue at 5.76:1. */
-  color: #a83a1c;
+  /* Was a hardcoded var(--hero-light) tuned for --paper (5.76:1, vs. --accent's failing
+     3.84:1 at 15px). The header now sits on --hero-bg (Task 3 of the
+     dark-theme-palette spec), so this re-points to --hero-light -- the same
+     token h1's .serif span and the nav-hover state already use on this dark
+     ground. This is a persistent state, not a hover, so axe catches it as soon
+     as a section becomes current; exact contrast is re-verified in Task 9, not
+     assumed here. */
+  color: var(--hero-light);
   text-decoration: underline;
   text-underline-offset: 6px;
 }
@@ -2418,7 +2386,7 @@ dialog p:last-child {
   .menu-toggle span {
     width: 20px;
     height: 1px;
-    background: var(--ink);
+    background: var(--hero-ink);
     margin-inline: auto;
   }
   .header nav {
@@ -2430,9 +2398,9 @@ dialog p:last-child {
     left: -20px;
     right: -20px;
     padding: 20px;
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 12px 15px #25282008;
+    background: var(--hero-bg);
+    border-bottom: 1px solid var(--hero-muted);
+    box-shadow: 0 12px 15px var(--ink-shadow-soft);
     font-size: 15px;
   }
   .header nav.open {
@@ -2454,7 +2422,7 @@ dialog p:last-child {
 }
 
 /* ---------------------------------------------------------------------------
-   Contact form. Lives inside the early-access panel (#e8eadd). The form sits on
+   Contact form. Lives inside the early-access panel (var(--access-surface)). The form sits on
    a --white surface the way .workspace does, and every colour in it is checked
    against that surface rather than the page paper -- which is why the modal
    below is --white too, and not the --paper the information dialog uses. Moving
@@ -2467,7 +2435,7 @@ dialog p:last-child {
    action lands under the note column instead of leaving it empty.
    --------------------------------------------------------------------------- */
 .contact-block {
-  border-top: 1px solid #c5cdb8;
+  border-top: 1px solid var(--access-divider);
   margin-top: 38px;
   padding-top: 30px;
   display: grid;
@@ -2505,7 +2473,7 @@ dialog p:last-child {
   align-items: center;
   gap: 8px;
   font-size: 10px;
-  color: #59624e;
+  color: var(--secondary-muted);
   margin: 0;
 }
 .contact-block h3 {
@@ -2517,7 +2485,7 @@ dialog p:last-child {
 .contact-lede {
   font-size: 14px;
   line-height: 1.7;
-  color: #4c5445;
+  color: var(--deep-sage);
   margin: 0;
 }
 /* ---------------------------------------------------------------------------
@@ -2574,7 +2542,7 @@ dialog p:last-child {
   border-radius: 8px;
   background: var(--white);
   color: var(--ink);
-  box-shadow: 0 30px 100px #0003;
+  box-shadow: 0 30px 100px var(--dialog-shadow);
   /* Scrolls itself rather than locking the document. Locking would mean
      `overflow: hidden` on the root, which removes the desktop scrollbar and
      shifts the whole page sideways by its width. `contain` stops the scroll
@@ -2610,7 +2578,7 @@ dialog p:last-child {
   position: relative;
   max-width: 620px;
   background: var(--white);
-  border: 1px solid #ccd2c2;
+  border: 1px solid var(--workspace-border);
   border-radius: 6px;
   padding: 28px 30px;
   display: grid;
@@ -2637,8 +2605,8 @@ dialog p:last-child {
   min-width: 0;
   max-width: 100%;
   padding: 12px 14px;
-  background: #faf9f4;
-  border: 1px solid #c4cbb6;
+  background: var(--surface-quiet);
+  border: 1px solid var(--input-border);
   border-radius: 4px;
 }
 .contact-form textarea {
@@ -2652,7 +2620,7 @@ dialog p:last-child {
 .contact-form textarea:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
-  border-color: #8f9a80;
+  border-color: var(--input-focus-border);
 }
 .field-hint {
   margin: 0;
@@ -2685,7 +2653,7 @@ dialog p:last-child {
 .field-invalid textarea {
   border-color: var(--error);
   border-left-width: 3px;
-  background: #fdf5f2;
+  background: var(--surface-form-error);
 }
 .consent-row {
   display: flex;
@@ -2783,17 +2751,17 @@ dialog p:last-child {
   font-weight: 500;
 }
 .contact-status[data-state="pending"] {
-  color: #4c5445;
+  color: var(--deep-sage);
 }
 .contact-status[data-state="success"] {
-  color: #35502a;
+  color: var(--contact-success);
   font-weight: 500;
 }
 .contact-confirmation {
   max-width: 620px;
   background: var(--white);
-  border: 1px solid #ccd2c2;
-  border-left: 3px solid #55674c;
+  border: 1px solid var(--workspace-border);
+  border-left: 3px solid var(--sage-marker);
   border-radius: 6px;
   padding: 26px 28px;
 }
@@ -2810,7 +2778,7 @@ dialog p:last-child {
 .contact-confirmation p {
   font-size: 14px;
   line-height: 1.7;
-  color: #4c5445;
+  color: var(--deep-sage);
   margin: 0;
 }
 .contact-confirmation p + p {
@@ -2878,5 +2846,760 @@ dialog p:last-child {
   }
   .contact-dialog h2 {
     font-size: 22px;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Direction A vignette promoted from design/hero-a.css.
+
+   The card is an opaque white product surface, so its verified internal
+   contrast stays unchanged. Only the surrounding panel, controls, and pointer
+   glow use the dark-hero tokens. The existing .orbit elements are retained as
+   background decoration behind the card; .a-depth and .a-controls sit above
+   them in the stack.
+   ------------------------------------------------------------------------- */
+.a-visual {
+  --a-loop: 12s;
+  --a-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --a-inset: 22px;
+  --a-sage-ink: var(--vignette-sage-ink);
+  --a-sage-tint: var(--vignette-sage-tint);
+  --a-sage-line: var(--vignette-sage-line);
+  --a-sage-mark: var(--sage-marker);
+  --a-commit: var(--vignette-commit);
+  --a-rule: var(--vignette-rule);
+  height: auto;
+  min-height: 0;
+  padding: var(--a-inset) var(--a-inset) 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.a-visual > .orbit {
+  left: 86%;
+  top: 80%;
+  z-index: 0;
+  border-color: var(--hero-muted);
+  opacity: 0.32;
+}
+.a-visual > .orbit-two::after,
+.a-visual > .orbit-three::after {
+  border-color: var(--hero-bg);
+  background: var(--hero-light);
+}
+.a-depth {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  perspective: 1600px;
+}
+.a-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--vignette-card-border);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 2px var(--card-shadow-small),
+    0 18px 40px var(--sage-shadow-deep);
+  font-size: 12.5px;
+  line-height: 1.5;
+  container: a-card / inline-size;
+}
+.a-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--a-rule);
+}
+.a-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.a-brand .mini-mark {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  font-size: 22px;
+  padding-bottom: 5px;
+}
+.a-sep {
+  color: var(--vignette-muted);
+}
+.a-status {
+  display: grid;
+  justify-items: end;
+  overflow: hidden;
+  border-radius: 3px;
+}
+.a-status > * {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+.a-sage {
+  background: var(--a-sage-tint);
+  color: var(--a-sage-ink);
+}
+.a-s0,
+.a-s1 {
+  transform: translateY(-120%);
+}
+.a-body {
+  position: relative;
+}
+.a-thread {
+  position: relative;
+  padding: 12px 16px 10px;
+  background: var(--surface-vignette-thread);
+  border-bottom: 1px solid var(--a-rule);
+}
+.a-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  line-height: 1.6;
+  color: var(--vignette-label);
+}
+.a-label-note {
+  font-weight: 400;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+  text-align: right;
+}
+.a-msgs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.a-msg {
+  overflow: hidden;
+}
+.a-msg-in {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--a-rule);
+}
+.a-icon {
+  color: var(--vignette-muted);
+}
+.a-text {
+  min-width: 0;
+}
+.a-when {
+  margin-left: auto;
+  font-size: 9.5px;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.a-reply .a-msg-in {
+  display: block;
+  padding: 8px 0 2px;
+  border-bottom: 0;
+}
+.a-from {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--a-sage-ink);
+}
+.a-from .a-when {
+  font-weight: 400;
+}
+.a-reply .a-text {
+  display: block;
+  line-height: 1.8;
+}
+.a-src {
+  position: relative;
+  z-index: 0;
+  display: inline-block;
+  padding: 0 2px;
+  margin: 0 -1px;
+  background: none;
+  color: inherit;
+  line-height: 1.55;
+}
+.a-src::before {
+  content: "";
+  position: absolute;
+  inset: 0 -1px;
+  z-index: -1;
+  border-radius: 3px;
+  background: var(--a-sage-tint);
+  box-shadow: inset 0 -1px 0 var(--a-sage-line);
+}
+.a-ref {
+  display: inline-grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: var(--a-sage-mark);
+  color: var(--surface-pure-white);
+  font-size: 8.5px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  vertical-align: 1px;
+}
+.a-sweep {
+  position: absolute;
+  inset: 32px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.a-sweep-band {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(
+    180deg,
+    var(--vignette-sweep-clear) 0,
+    var(--vignette-sweep-clear) calc(100% - 64px),
+    var(--vignette-sweep-fade) calc(100% - 2px),
+    var(--vignette-sweep-edge) calc(100% - 2px),
+    var(--vignette-sweep-edge) 100%
+  );
+}
+.a-clarity {
+  padding: 12px 16px 14px;
+}
+.a-spark {
+  color: var(--sage-spark);
+}
+.a-fields {
+  margin: 0;
+}
+.a-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 36px;
+  border-bottom: 1px solid var(--a-rule);
+}
+.a-field::before {
+  content: "";
+  position: absolute;
+  inset: 0 -16px;
+  z-index: -1;
+  background: var(--surface-vignette-field);
+  opacity: 0;
+}
+.a-field dt {
+  color: var(--muted);
+}
+.a-field dd {
+  margin: 0;
+  font-weight: 500;
+  text-align: right;
+}
+.a-slot {
+  display: inline-grid;
+  justify-items: end;
+  overflow: hidden;
+  vertical-align: top;
+}
+.a-slot > * {
+  grid-area: 1 / 1;
+}
+.a-was {
+  font-weight: 400;
+  color: var(--muted);
+  transform: translateY(-110%);
+}
+.a-attention {
+  color: var(--attention);
+}
+.a-now {
+  display: inline-flex;
+  align-items: center;
+}
+.a-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding-top: 12px;
+}
+.a-review,
+.a-chip-clip {
+  display: inline-flex;
+  overflow: hidden;
+}
+.a-review-in {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--sage-success);
+}
+.a-check {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--vignette-check-border);
+  border-radius: 50%;
+  background: var(--surface-vignette-check);
+  font-size: 9px;
+}
+.a-chip-clip {
+  border-radius: 999px;
+}
+.a-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px 10px;
+  border-radius: 999px;
+  background: var(--a-commit);
+  color: var(--surface-pure-white);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.a-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--surface-vignette-commit-dot);
+}
+.a-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--white);
+  opacity: 0;
+  pointer-events: none;
+}
+@container a-card (max-width: 370px) {
+  .a-field {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
+    padding: 7px 0;
+  }
+  .a-field dd {
+    text-align: left;
+  }
+  .a-slot {
+    justify-items: start;
+  }
+  .a-label-note {
+    display: none;
+  }
+}
+.motion-controls {
+  position: relative;
+  z-index: 1;
+}
+.a-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0 16px;
+}
+.motion-toggle {
+  --toggle-ink: var(--ink);
+  --toggle-surface: var(--white);
+  --toggle-border: var(--hero-muted);
+  --toggle-pressed-ink: var(--hero-bg);
+  --toggle-pressed-surface: var(--hero-light);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--toggle-border);
+  border-radius: 999px;
+  background: var(--toggle-surface);
+  color: var(--toggle-ink);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  transition: transform 200ms ease-out;
+}
+.motion-toggle:hover {
+  transform: translateY(-1px);
+}
+.motion-toggle[aria-pressed="true"] {
+  background: var(--toggle-pressed-surface);
+  border-color: var(--toggle-pressed-surface);
+  color: var(--toggle-pressed-ink);
+}
+.motion-controls:not([data-ready]) .motion-toggle {
+  visibility: hidden;
+}
+.motion-icon {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+.motion-icon::before,
+.motion-icon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.motion-icon::before {
+  left: 1px;
+}
+.motion-icon::after {
+  right: 1px;
+}
+.motion-toggle[aria-pressed="true"] .motion-icon::before {
+  left: 1px;
+  width: 9px;
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.motion-toggle[aria-pressed="true"] .motion-icon::after {
+  content: none;
+}
+.a-progress {
+  flex: 1;
+  max-width: 150px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--hero-muted) 50%, transparent);
+}
+.a-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--hero-light);
+  transform-origin: left;
+}
+.a-fictional {
+  margin-left: auto;
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: var(--hero-muted);
+  white-space: nowrap;
+}
+html[data-motion="paused"] *,
+html[data-motion="paused"] *::before,
+html[data-motion="paused"] *::after,
+[data-inview-gate]:not([data-inview]),
+[data-inview-gate]:not([data-inview])::before,
+[data-inview-gate]:not([data-inview])::after,
+[data-inview-gate]:not([data-inview]) *,
+[data-inview-gate]:not([data-inview]) *::before,
+[data-inview-gate]:not([data-inview]) *::after {
+  animation-play-state: paused !important;
+}
+html[data-motion="paused"] .motion-toggle,
+html[data-motion="paused"] .motion-toggle:hover {
+  transition: none !important;
+  transform: none;
+}
+@media (scripting: none) {
+  .a-visual *,
+  .a-visual *::before,
+  .a-visual *::after {
+    animation: none !important;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .a-m1 .a-msg-in {
+    animation: a-m1 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-m2 .a-msg-in {
+    animation: a-m2 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-m3 .a-msg-in {
+    animation: a-m3 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-m4 .a-msg-in {
+    animation: a-m4 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-s0 {
+    animation: a-s0 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-s1 {
+    animation: a-s1 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-s2 {
+    animation: a-s2 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-sweep-band {
+    animation: a-sweep var(--a-loop) cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  .a-t1::before {
+    animation: a-hl1 var(--a-loop) ease-out infinite;
+  }
+  .a-t2::before {
+    animation: a-hl2 var(--a-loop) ease-out infinite;
+  }
+  .a-t3::before {
+    animation: a-hl3 var(--a-loop) ease-out infinite;
+  }
+  .a-t1 .a-ref {
+    animation: a-ref1 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-t2 .a-ref {
+    animation: a-ref2 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-t3 .a-ref {
+    animation: a-ref3 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-f1 .a-was {
+    animation: a-was1 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-f2 .a-was {
+    animation: a-was2 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-f3 .a-was {
+    animation: a-was3 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-f1 .a-now {
+    animation: a-now1 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-f2 .a-now {
+    animation: a-now2 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-f3 .a-now {
+    animation: a-now3 var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-f1::before {
+    animation: a-flash1 var(--a-loop) ease-out infinite;
+  }
+  .a-f2::before {
+    animation: a-flash2 var(--a-loop) ease-out infinite;
+  }
+  .a-f3::before {
+    animation: a-flash3 var(--a-loop) ease-out infinite;
+  }
+  .a-review-in {
+    animation: a-review var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-chip {
+    animation: a-chip var(--a-loop) var(--a-ease) infinite;
+  }
+  .a-veil {
+    animation: a-veil var(--a-loop) ease-in-out infinite;
+  }
+  .a-progress > span {
+    animation: a-progress var(--a-loop) linear infinite;
+  }
+}
+@keyframes a-m1 {
+  0%, 2.08% { transform: translateY(105%); }
+  5%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(105%); }
+}
+@keyframes a-m2 {
+  0%, 6.67% { transform: translateY(105%); }
+  9.58%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(105%); }
+}
+@keyframes a-m3 {
+  0%, 11.25% { transform: translateY(105%); }
+  14.17%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(105%); }
+}
+@keyframes a-m4 {
+  0%, 16.67% { transform: translateY(105%); }
+  20.42%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(105%); }
+}
+@keyframes a-s0 {
+  0%, 22.5% { transform: none; }
+  25%, 91% { transform: translateY(-120%); }
+  91.01% { transform: translateY(120%); }
+  94%, 100% { transform: none; }
+}
+@keyframes a-s1 {
+  0%, 22.5% { transform: translateY(120%); }
+  25%, 55.42% { transform: none; }
+  58.75%, 100% { transform: translateY(-120%); }
+}
+@keyframes a-s2 {
+  0%, 55.42% { transform: translateY(120%); }
+  58.75%, 91% { transform: none; }
+  94%, 100% { transform: translateY(-120%); }
+}
+@keyframes a-sweep {
+  0%, 22.5% { opacity: 0; transform: translateY(-100%); }
+  23.5%, 31% { opacity: 1; }
+  32.5%, 100% { opacity: 0; transform: none; }
+}
+@keyframes a-hl1 {
+  0%, 33.75% { opacity: 0; }
+  35.5%, 93.5% { opacity: 1; }
+  93.6%, 100% { opacity: 0; }
+}
+@keyframes a-hl2 {
+  0%, 38.75% { opacity: 0; }
+  40.5%, 93.5% { opacity: 1; }
+  93.6%, 100% { opacity: 0; }
+}
+@keyframes a-hl3 {
+  0%, 43.75% { opacity: 0; }
+  45.5%, 93.5% { opacity: 1; }
+  93.6%, 100% { opacity: 0; }
+}
+@keyframes a-ref1 {
+  0%, 34.5% { transform: scale(0); }
+  36.25%, 93.5% { transform: none; }
+  93.6%, 100% { transform: scale(0); }
+}
+@keyframes a-ref2 {
+  0%, 39.5% { transform: scale(0); }
+  41.25%, 93.5% { transform: none; }
+  93.6%, 100% { transform: scale(0); }
+}
+@keyframes a-ref3 {
+  0%, 44.5% { transform: scale(0); }
+  46.25%, 93.5% { transform: none; }
+  93.6%, 100% { transform: scale(0); }
+}
+@keyframes a-was1 {
+  0%, 34.75% { transform: none; }
+  37.08%, 93.5% { transform: translateY(-110%); }
+  93.6%, 100% { transform: none; }
+}
+@keyframes a-was2 {
+  0%, 39.75% { transform: none; }
+  42.08%, 93.5% { transform: translateY(-110%); }
+  93.6%, 100% { transform: none; }
+}
+@keyframes a-was3 {
+  0%, 44.75% { transform: none; }
+  47.08%, 93.5% { transform: translateY(-110%); }
+  93.6%, 100% { transform: none; }
+}
+@keyframes a-now1 {
+  0%, 34.75% { transform: translateY(110%); }
+  37.08%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(110%); }
+}
+@keyframes a-now2 {
+  0%, 39.75% { transform: translateY(110%); }
+  42.08%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(110%); }
+}
+@keyframes a-now3 {
+  0%, 44.75% { transform: translateY(110%); }
+  47.08%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(110%); }
+}
+@keyframes a-flash1 {
+  0%, 34.75% { opacity: 0; }
+  35.75% { opacity: 1; }
+  39.75%, 100% { opacity: 0; }
+}
+@keyframes a-flash2 {
+  0%, 39.75% { opacity: 0; }
+  40.75% { opacity: 1; }
+  44.75%, 100% { opacity: 0; }
+}
+@keyframes a-flash3 {
+  0%, 44.75% { opacity: 0; }
+  45.75% { opacity: 1; }
+  49.75%, 100% { opacity: 0; }
+}
+@keyframes a-review {
+  0%, 50.42% { transform: translateY(110%); }
+  53.33%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(110%); }
+}
+@keyframes a-chip {
+  0%, 55.42% { transform: translateY(120%); }
+  58.75%, 93.5% { transform: none; }
+  93.6%, 100% { transform: translateY(120%); }
+}
+@keyframes a-veil {
+  0%, 90% { opacity: 0; }
+  92.92%, 95.42% { opacity: 1; }
+  97.92%, 100% { opacity: 0; }
+}
+@keyframes a-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .a-light {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    width: 460px;
+    height: 460px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, var(--hero-light), transparent);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(
+      calc(var(--mx, 50%) - var(--a-inset) - 50%),
+      calc(var(--my, 50%) - var(--a-inset) - 50%)
+    );
+    transition:
+      opacity 500ms ease-out,
+      transform 160ms linear;
+  }
+  .a-visual[data-pointer="on"] .a-light {
+    opacity: 0.1;
+  }
+  .a-card {
+    transition: transform 700ms var(--a-ease);
+  }
+  .a-visual[data-pointer="on"] .a-card {
+    transform: rotateX(calc(var(--py, 0) * -1.4deg))
+      rotateY(calc(var(--px, 0) * 1.8deg));
+  }
+}
+@media (max-width: 1100px) {
+  .a-visual {
+    --a-inset: 18px;
+  }
+}
+@media (max-width: 540px) {
+  .a-visual {
+    --a-inset: 14px;
+  }
+  .a-bar {
+    padding: 0 12px;
+  }
+  .a-thread,
+  .a-clarity {
+    padding-inline: 12px;
+  }
+  .a-field::before {
+    inset-inline: -12px;
+  }
+  .a-card {
+    font-size: 12px;
   }
 }

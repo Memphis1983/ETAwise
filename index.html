@@ -127,7 +127,8 @@
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <header class="header wrap">
+    <header class="header">
+      <div class="wrap header-inner">
       <a href="/" class="brand" aria-label="ETAwise home"
         ><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span
         >ETA<span class="brand-light">wise</span
@@ -151,10 +152,12 @@
       <a class="nav-cta" href="#early-access"
         >Early access <span aria-hidden="true">&#8599;</span></a
       >
+          </div>
     </header>
 
     <main id="main">
-      <section class="hero wrap">
+      <section class="hero">
+        <div class="wrap hero-inner">
         <div class="hero-kicker">
           <span class="status-dot"></span
           ><span>AI-ASSISTED SUPPORT OPERATIONS</span
@@ -193,42 +196,168 @@
               space between escalated and resolved.
             </div>
           </div>
-          <div
-            class="hero-visual"
-            role="img"
-            aria-label="Illustration of a case moving from handoff to next action"
-          >
-            <div class="orbit orbit-one"></div>
-            <div class="orbit orbit-two"></div>
-            <div class="orbit orbit-three"></div>
-            <div class="visual-top">
-              <span class="micro">THE FOLLOW-THROUGH SIGNAL</span
-              ><span class="micro">01 / 03</span>
-            </div>
-            <div class="handoff-label">
-              <span class="small-dot"></span> CASE HANDED OVER
-            </div>
-            <div class="signal-line"></div>
-            <div class="signal-core">
-              <span class="core-symbol" aria-hidden="true">e</span>
-            </div>
-            <div class="signal-note">
-              <span class="orange-dot"></span> Clarity, carried forward.
-            </div>
-            <div class="action-slip">
-              <div class="slip-check" aria-hidden="true">&#10003;</div>
-              <div>
-                <span class="micro">NEXT ACTION IDENTIFIED</span
-                ><strong>Review. Confirm. Move forward.</strong>
+          <div class="hero-visual a-visual" data-inview-gate>
+            <div class="orbit orbit-one" aria-hidden="true"></div>
+            <div class="orbit orbit-two" aria-hidden="true"></div>
+            <div class="orbit orbit-three" aria-hidden="true"></div>
+            <div class="a-depth">
+              <div
+                class="a-card"
+                role="img"
+                aria-label="Animated product vignette using fictional data for case EW-1043. Three follow-up messages arrive without a commitment, then the Access team replies. An AI pass identifies the receiving owner as Access team, the next action as reviewing the access logs, and the next update as Tuesday at 14:00 UTC, each linked to its source sentence. Your team confirms the details and the update becomes a dated commitment."
+              >
+                <div class="a-light"></div>
+                <div class="a-bar">
+                  <span class="a-brand"
+                    ><span class="mini-mark">e</span> ETAwise
+                    <span class="a-sep">/</span> EW-1043</span
+                  >
+                  <span class="a-status"
+                    ><span class="case-state amber a-s0">Needs attention</span
+                    ><span class="case-state a-sage a-s1">Reading thread</span
+                    ><span class="case-state green a-s2"
+                      >Update committed</span
+                    ></span
+                  >
+                </div>
+                <div class="a-body">
+                  <div class="a-thread">
+                    <p class="a-label">
+                      <span>THREAD</span
+                      ><span class="a-label-note"
+                        >Account access investigation</span
+                      >
+                    </p>
+                    <ol class="a-msgs">
+                      <li class="a-msg a-m1">
+                        <span class="a-msg-in"
+                          ><span class="a-icon">&#8627;</span
+                          ><span class="a-text"
+                            >&quot;Following up on this case.&quot;</span
+                          ><span class="a-when">MON</span></span
+                        >
+                      </li>
+                      <li class="a-msg a-m2">
+                        <span class="a-msg-in"
+                          ><span class="a-icon">&#8627;</span
+                          ><span class="a-text"
+                            >&quot;Any update for the customer?&quot;</span
+                          ><span class="a-when">WED</span></span
+                        >
+                      </li>
+                      <li class="a-msg a-m3">
+                        <span class="a-msg-in"
+                          ><span class="a-icon">&#8627;</span
+                          ><span class="a-text">&quot;Checking in again.&quot;</span
+                          ><span class="a-when">FRI</span></span
+                        >
+                      </li>
+                      <li class="a-msg a-m4 a-reply">
+                        <span class="a-msg-in"
+                          ><span class="a-from"
+                            ><span class="a-from-name">Access team</span
+                            ><span class="a-when">MON 11:30</span></span
+                          ><span class="a-text"
+                            >&quot;<mark class="a-src a-t1"
+                              >We have accepted the case<span class="a-ref"
+                                >1</span
+                              ></mark
+                            > and
+                            <mark class="a-src a-t2"
+                              >will review the access logs<span class="a-ref"
+                                >2</span
+                              ></mark
+                            >. We will send
+                            <mark class="a-src a-t3"
+                              >an update by Tuesday at 14:00 UTC<span
+                                class="a-ref"
+                                >3</span
+                              ></mark
+                            >. We cannot confirm a resolution time yet.&quot;</span
+                          ></span
+                        >
+                      </li>
+                    </ol>
+                    <div class="a-sweep"><div class="a-sweep-band"></div></div>
+                  </div>
+                  <div class="a-clarity">
+                    <p class="a-label">
+                      <span
+                        ><span class="a-spark">&#10022;</span> AI-ASSISTED
+                        CLARITY</span
+                      ><span class="a-label-note">EXAMPLE OUTPUT</span>
+                    </p>
+                    <dl class="a-fields">
+                      <div class="a-field a-f1">
+                        <dt>Receiving owner</dt>
+                        <dd>
+                          <span class="a-slot"
+                            ><span class="a-was">Not yet confirmed</span
+                            ><span class="a-now"
+                              >Access team<span class="a-ref">1</span></span
+                            ></span
+                          >
+                        </dd>
+                      </div>
+                      <div class="a-field a-f2">
+                        <dt>Next action</dt>
+                        <dd>
+                          <span class="a-slot"
+                            ><span class="a-was">Awaiting specialist review</span
+                            ><span class="a-now"
+                              >Review the access logs<span class="a-ref"
+                                >2</span
+                              ></span
+                            ></span
+                          >
+                        </dd>
+                      </div>
+                      <div class="a-field a-f3">
+                        <dt>Next update</dt>
+                        <dd>
+                          <span class="a-slot"
+                            ><span class="a-was a-attention"
+                              >No commitment recorded</span
+                            ><span class="a-now"
+                              >Tuesday, 14:00 UTC<span class="a-ref"
+                                >3</span
+                              ></span
+                            ></span
+                          >
+                        </dd>
+                      </div>
+                    </dl>
+                    <div class="a-foot">
+                      <span class="a-review"
+                        ><span class="a-review-in"
+                          ><span class="a-check">&#10003;</span> Confirmed by
+                          your team</span
+                        ></span
+                      ><span class="a-chip-clip"
+                        ><span class="a-chip"
+                          ><span class="a-chip-dot"></span> Update due &middot;
+                          Tue 14:00 UTC</span
+                        ></span
+                      >
+                    </div>
+                  </div>
+                  <div class="a-veil"></div>
+                </div>
               </div>
-              <span class="slip-arrow" aria-hidden="true">&#8599;</span>
             </div>
-            <div class="visual-bottom micro">
-              <span>OWNERSHIP</span><span>ACTION</span
-              ><span>ACCOUNTABILITY</span>
+            <div class="motion-controls a-controls" data-motion-controls>
+              <button class="motion-toggle" type="button" aria-pressed="false">
+                <span class="motion-icon" aria-hidden="true"></span
+                ><span class="motion-label">Pause motion</span>
+              </button>
+              <span class="a-progress" aria-hidden="true"
+                ><span data-loop-clock></span
+              ></span>
+              <span class="micro a-fictional">FICTIONAL EXAMPLE</span>
             </div>
           </div>
         </div>
+              </div>
       </section>
 
       <div class="principle-strip">
