@@ -631,3 +631,94 @@ function initContactForm(form) {
     }
   });
 }
+
+// Direction A vignette plumbing. The loop itself is CSS-only; this block owns
+// the pause state, viewport gate, and fine-pointer depth/glow effects. It is
+// intentionally separate from the live header/mobile-nav logic above.
+const vignetteVisual = document.querySelector(".a-visual");
+if (vignetteVisual) {
+  const motionRoot = document.documentElement;
+  const motionToggle = vignetteVisual.querySelector(".motion-toggle");
+  const motionControls = vignetteVisual.querySelector("[data-motion-controls]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+  let motionPaused = false;
+  const listeners = new Set();
+
+  const setMotionPaused = (next) => {
+    motionPaused = next;
+    motionToggle.setAttribute("aria-pressed", String(motionPaused));
+    if (motionPaused) motionRoot.dataset.motion = "paused";
+    else delete motionRoot.dataset.motion;
+    for (const listener of listeners) listener(motionPaused);
+  };
+
+  motionToggle.addEventListener("click", () =>
+    setMotionPaused(!motionPaused),
+  );
+  motionControls.dataset.ready = "true";
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) delete entry.target.dataset.inview;
+          else if (entry.intersectionRatio >= 0.25)
+            entry.target.dataset.inview = "true";
+        }
+      },
+      { threshold: [0, 0.25] },
+    );
+    observer.observe(vignetteVisual);
+  } else {
+    vignetteVisual.dataset.inview = "true";
+  }
+
+  let frame = 0;
+  let clientX = 0;
+  let clientY = 0;
+  const clamp = (value) => Math.max(-1, Math.min(1, value));
+  const pointerEnabled = () =>
+    finePointer.matches && !reducedMotion.matches && !motionPaused;
+
+  const applyPointer = () => {
+    frame = 0;
+    const rect = vignetteVisual.getBoundingClientRect();
+    const mx = clientX - rect.left;
+    const my = clientY - rect.top;
+    vignetteVisual.style.setProperty("--mx", `${mx.toFixed(1)}px`);
+    vignetteVisual.style.setProperty("--my", `${my.toFixed(1)}px`);
+    vignetteVisual.style.setProperty(
+      "--px",
+      clamp((mx / rect.width) * 2 - 1).toFixed(3),
+    );
+    vignetteVisual.style.setProperty(
+      "--py",
+      clamp((my / rect.height) * 2 - 1).toFixed(3),
+    );
+    vignetteVisual.dataset.pointer = "on";
+  };
+
+  const resetPointer = () => {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    for (const name of ["--px", "--py", "--mx", "--my"])
+      vignetteVisual.style.removeProperty(name);
+    delete vignetteVisual.dataset.pointer;
+  };
+
+  vignetteVisual.addEventListener("pointermove", (event) => {
+    if (event.pointerType === "touch" || !pointerEnabled()) return;
+    clientX = event.clientX;
+    clientY = event.clientY;
+    if (!frame) frame = requestAnimationFrame(applyPointer);
+  });
+  vignetteVisual.addEventListener("pointerleave", resetPointer);
+  listeners.add((paused) => paused && resetPointer());
+  reducedMotion.addEventListener("change", (event) => {
+    if (event.matches) resetPointer();
+  });
+  finePointer.addEventListener("change", (event) => {
+    if (!event.matches) resetPointer();
+  });
+}
